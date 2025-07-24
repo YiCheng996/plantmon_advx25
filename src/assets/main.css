@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@import './base.css';
+
+/* 保留基础的链接样式 */
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+/* 确保body占满全屏，移除桌面端的特殊布局 */
+body {
+  margin: 0;
+  padding: 0;
+}
