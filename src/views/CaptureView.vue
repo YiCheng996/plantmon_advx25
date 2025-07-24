@@ -20,6 +20,8 @@ const mediaStream = ref<MediaStream | null>(null)
 const isRetrying = ref(false)
 const retryCount = ref(0)
 const maxRetries = 3
+// 添加摄像头朝向状态
+const currentFacingMode = ref<'user' | 'environment'>('environment')
 
 const captureResult = ref<{
   success: boolean
@@ -77,6 +79,7 @@ const initCamera = async (isRetry = false) => {
     try {
       // 首先尝试后置摄像头
       stream = await navigator.mediaDevices.getUserMedia(constraints)
+      currentFacingMode.value = 'environment'
     } catch (backCameraError) {
       console.log('后置摄像头不可用，尝试前置摄像头...', backCameraError)
       // 如果后置摄像头失败，尝试前置摄像头
@@ -89,6 +92,7 @@ const initCamera = async (isRetry = false) => {
 
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints)
+        currentFacingMode.value = 'user'
       } catch (frontCameraError) {
         console.log('前置摄像头也不可用，尝试任意摄像头...', frontCameraError)
         // 如果指定摄像头都失败，尝试任意可用的摄像头
@@ -97,6 +101,8 @@ const initCamera = async (isRetry = false) => {
           audio: false,
         }
         stream = await navigator.mediaDevices.getUserMedia(constraints)
+        // 默认假设是后置摄像头
+        currentFacingMode.value = 'environment'
       }
     }
 
@@ -412,9 +418,8 @@ const switchCamera = async () => {
   // 停止当前流
   mediaStream.value.getTracks().forEach((track) => track.stop())
 
-  // 获取当前摄像头模式
-  const currentFacingMode = mediaStream.value.getVideoTracks()[0]?.getSettings()?.facingMode
-  const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user'
+  // 切换摄像头模式
+  const newFacingMode = currentFacingMode.value === 'user' ? 'environment' : 'user'
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -427,6 +432,7 @@ const switchCamera = async () => {
     })
 
     mediaStream.value = stream
+    currentFacingMode.value = newFacingMode
 
     if (videoRef.value) {
       videoRef.value.srcObject = stream
@@ -448,7 +454,9 @@ const closeModal = () => {
 // 查看详情
 const viewDetails = () => {
   if (captureResult.value.plantmon) {
-    router.push(`/detail/${captureResult.value.plantmon.id}`)
+    // 对包含特殊字符的ID进行URL编码
+    const encodedId = encodeURIComponent(captureResult.value.plantmon.id)
+    router.push(`/detail/${encodedId}`)
   }
 }
 
@@ -532,7 +540,11 @@ onUnmounted(() => {
         playsinline
         muted
         class="camera-video w-full h-full object-cover"
-        :class="{ 'opacity-0': !cameraReady }"
+        :class="{
+          'opacity-0': !cameraReady,
+          'front-camera': currentFacingMode === 'user',
+          'back-camera': currentFacingMode === 'environment',
+        }"
         @loadedmetadata="onVideoLoaded"
       ></video>
 
@@ -824,14 +836,21 @@ onUnmounted(() => {
 
 /* 视频元素样式 */
 .camera-video {
-  /* 镜像显示，让用户感觉更自然 */
-  transform: scaleX(-1);
   /* 确保视频完全填充容器 */
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
   /* 移除默认的视频控件样式 */
   background: transparent;
+}
+
+/* 前置摄像头镜像显示，后置摄像头不镜像 */
+.camera-video.front-camera {
+  transform: scaleX(-1);
+}
+
+.camera-video.back-camera {
+  transform: none;
 }
 
 /* 摄像头占位符样式 */
