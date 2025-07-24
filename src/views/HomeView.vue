@@ -166,7 +166,21 @@ export default {
 
 /* 导航按钮样式 */
 .nav-button {
-  @apply rounded-2xl p-4 text-center shadow-lg transform hover:scale-105 transition-all duration-200 flex flex-col items-center justify-center min-h-[100px];
+  border-radius: 1rem; /* rounded-2xl equivalent */
+  padding: 1rem; /* p-4 equivalent */
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg equivalent */
+  transform: scale(1);
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.nav-button:hover {
+  transform: scale(1.05);
 }
 
 .nav-button:active {
