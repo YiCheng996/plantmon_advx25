@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { usePlantmonStore } from '@/store/plantmon'
-
-const plantmonStore = usePlantmonStore()
-
-// 获取当前出战的植宠
-const activePlantmon = computed(() => plantmonStore.activePlantmon)
 
 // 外部对战链接（暂时设为空，后续由用户提供）
 // const battleUrl = 'https://example.com/battle'
@@ -17,7 +10,7 @@ const activePlantmon = computed(() => plantmonStore.activePlantmon)
     <!-- 背景图层 -->
     <div class="absolute inset-0">
       <img
-        src="/Pic/scenes/背景.png"
+        src="/Pic/scenes/背景.webp"
         alt="游戏背景"
         class="w-full h-full object-cover"
         @error="($event.target as HTMLImageElement).style.display = 'none'"
@@ -32,110 +25,78 @@ const activePlantmon = computed(() => plantmonStore.activePlantmon)
     <div class="relative z-10 flex flex-col h-screen">
       <!-- 顶部Logo区域 -->
       <header class="pt-12 pb-6 text-center">
-        <div class="bg-black/20 backdrop-blur-sm rounded-2xl mx-6 py-4">
-          <h1 class="text-4xl font-bold text-white mb-2 drop-shadow-lg font-mixed">🌱 Plantmon</h1>
+        <div class="flex items-center justify-center">
+          <img
+            src="/Pic/scenes/logo.svg"
+            alt="Plantmon Logo"
+            class="h-60 w-auto drop-shadow-2xl"
+            @error="($event.target as HTMLImageElement).style.display = 'none'"
+          />
         </div>
       </header>
 
-      <!-- 植宠展示区（核心区域） -->
-      <div class="flex-1 flex items-center justify-center px-6">
-        <div
-          class="plantmon-display bg-white/95 backdrop-blur-md rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-white/20"
-        >
-          <!-- 状态一：无植宠 -->
-          <div v-if="!activePlantmon" class="text-center py-8">
-            <div
-              class="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner"
-            >
-              <span class="text-4xl">🥚</span>
-            </div>
-            <h2 class="text-xl font-bold text-gray-700 mb-2 font-chinese">等待孵化中...</h2>
-            <p class="text-sm text-gray-500 leading-relaxed font-chinese">
-              快去捕获你的第一只植宠吧！<br />每一次拍照都可能遇到奇迹
-            </p>
-          </div>
-
-          <!-- 状态二：有植宠 -->
-          <div v-else class="text-center py-4">
-            <!-- 植宠图片 -->
-            <div class="relative w-32 h-32 mx-auto mb-4">
-              <div
-                class="w-full h-full bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 rounded-full overflow-hidden shadow-lg"
-              >
-                <img
-                  :src="activePlantmon.image"
-                  :alt="activePlantmon.name"
-                  class="w-full h-full object-cover"
-                  @error="
-                    ($event.target as HTMLImageElement).src =
-                      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
-                  "
-                />
-              </div>
-              <!-- 出战光环效果 -->
-              <div
-                class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-pulse opacity-75"
-              ></div>
-            </div>
-
-            <!-- 植宠信息 -->
-            <h2 class="text-2xl font-bold text-gray-800 mb-1 font-chinese">
-              {{ activePlantmon.name }}
-            </h2>
-            <p class="text-sm text-gray-500 mb-3 font-mono font-english">{{ activePlantmon.id }}</p>
-
-            <!-- 属性标签 -->
-            <div class="flex flex-wrap gap-2 justify-center mb-4">
-              <span
-                v-for="attr in activePlantmon.attributes"
-                :key="attr"
-                :class="[
-                  'px-3 py-1 text-xs rounded-full font-medium shadow-sm font-chinese',
-                  getAttributeColor(attr),
-                ]"
-              >
-                {{ attr }}
-              </span>
-            </div>
-
-            <!-- 简短描述 -->
-            <p class="text-xs text-gray-600 leading-relaxed px-2 font-chinese">
-              {{ activePlantmon.description.slice(0, 50) }}...
-            </p>
-          </div>
+      <!-- 角色形象展示区 -->
+      <div class="flex-1 flex items-center justify-center px-6 -mt-16">
+        <div class="character-display flex items-center justify-center">
+          <img
+            src="/Pic/scenes/starrole.webp"
+            alt="植宠角色形象"
+            class="max-h-130 w-auto object-contain drop-shadow-2xl character-image"
+            @error="($event.target as HTMLImageElement).style.display = 'none'"
+          />
         </div>
       </div>
 
       <!-- 底部导航按钮区域 -->
       <div class="pb-8 px-6">
-        <div class="bg-black/20 backdrop-blur-sm rounded-3xl p-4">
-          <div class="grid grid-cols-3 gap-4">
-            <!-- AI生成按钮（核心按钮） -->
-            <RouterLink
-              to="/capture"
-              class="nav-button bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white"
-            >
-              <div class="text-3xl mb-2">🤖</div>
-              <div class="text-xs opacity-80 font-chinese">AI生成植宠</div>
-            </RouterLink>
-
-            <!-- 图鉴按钮 -->
+        <div class="p-6">
+          <div class="flex justify-center items-center gap-8">
+            <!-- 图鉴按钮（左侧） -->
             <RouterLink
               to="/index"
-              class="nav-button bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+              class="nav-button-svg flex flex-col items-center justify-center p-6"
             >
-              <div class="text-3xl mb-2">📚</div>
-              <div class="text-sm font-bold font-chinese">植宠图鉴</div>
+              <img
+                src="/Pic/elements/dex.svg"
+                alt="植宠图鉴"
+                class="w-24 h-24 drop-shadow-lg"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="text-sm font-chinese text-white/90 mt-3">图鉴</div>
             </RouterLink>
 
-            <!-- 调试工具按钮 -->
+            <!-- 捕捉按钮（中央，主要按钮） -->
             <RouterLink
-              to="/font-debug"
-              class="nav-button bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+              to="/capture"
+              class="nav-button-svg flex flex-col items-center justify-center p-6 relative"
             >
-              <div class="text-3xl mb-2">🔧</div>
-              <div class="text-sm font-bold font-chinese">调试工具</div>
+              <img
+                src="/Pic/elements/catch.svg"
+                alt="捕捉植宠"
+                class="w-28 h-28 drop-shadow-2xl"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="text-base font-chinese text-white font-bold mt-3">捕捉</div>
+              <!-- 主要按钮的光环效果 -->
+              <!-- <div
+                class="absolute -inset-2 bg-gradient-to-r from-yellow-400/30 to-orange-400/30 rounded-3xl animate-pulse"
+              ></div> -->
             </RouterLink>
+
+            <!-- 战斗按钮（右侧） -->
+            <a
+              href="https://www.baidu.com"
+              target="_blank"
+              class="nav-button-svg flex flex-col items-center justify-center p-6"
+            >
+              <img
+                src="/Pic/elements/fight.svg"
+                alt="战斗"
+                class="w-24 h-24 drop-shadow-lg"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="text-sm font-chinese text-white/90 mt-3">战斗</div>
+            </a>
           </div>
         </div>
       </div>
@@ -143,37 +104,19 @@ const activePlantmon = computed(() => plantmonStore.activePlantmon)
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  methods: {
-    getAttributeColor(attribute: string): string {
-      const colorMap: Record<string, string> = {
-        火焰: 'bg-red-100 text-red-800',
-        冰霜: 'bg-blue-100 text-blue-800',
-        自然: 'bg-green-100 text-green-800',
-        暗影: 'bg-gray-100 text-gray-800',
-        神秘: 'bg-purple-100 text-purple-800',
-        守护: 'bg-yellow-100 text-yellow-800',
-        精灵: 'bg-pink-100 text-pink-800',
-        敏捷: 'bg-cyan-100 text-cyan-800',
-        战士: 'bg-orange-100 text-orange-800',
-        法师: 'bg-indigo-100 text-indigo-800',
-      }
-      return colorMap[attribute] || 'bg-gray-100 text-gray-800'
-    },
-  },
-}
-</script>
-
 <style scoped>
 /* 移动端优化的样式 */
 .home-page {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 植宠展示区动画 */
-.plantmon-display {
+/* 角色形象展示区动画 */
+.character-display {
   animation: float 4s ease-in-out infinite;
+}
+
+.character-image {
+  animation: gentle-sway 6s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -186,29 +129,33 @@ export default {
   }
 }
 
-/* 导航按钮样式 */
-.nav-button {
-  border-radius: 1rem; /* rounded-2xl equivalent */
-  padding: 1rem; /* p-4 equivalent */
-  text-align: center;
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg equivalent */
+@keyframes gentle-sway {
+  0%,
+  100% {
+    transform: translateX(0px) scale(1);
+  }
+  33% {
+    transform: translateX(5px) scale(1.02);
+  }
+  66% {
+    transform: translateX(-5px) scale(0.98);
+  }
+}
+
+/* SVG导航按钮样式 */
+.nav-button-svg {
   transform: scale(1);
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100px;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.nav-button:hover {
-  transform: scale(1.05);
+.nav-button-svg:hover {
+  transform: scale(1.1) translateY(-2px);
 }
 
-.nav-button:active {
-  transform: scale(0.95);
+.nav-button-svg:active {
+  transform: scale(1.05) translateY(0px);
+  transition: all 0.1s ease;
 }
 
 /* 背景图片加载优化 */
