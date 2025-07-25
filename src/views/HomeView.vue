@@ -54,7 +54,7 @@ import { RouterLink } from 'vue-router'
             <!-- 图鉴按钮（左侧） -->
             <RouterLink
               to="/index"
-              class="nav-button-svg flex flex-col items-center justify-center p-6"
+              class="nav-button-svg flex flex-col items-center justify-center"
             >
               <img
                 src="/Pic/elements/dex.svg"
@@ -68,7 +68,7 @@ import { RouterLink } from 'vue-router'
             <!-- 捕捉按钮（中央，主要按钮） -->
             <RouterLink
               to="/capture"
-              class="nav-button-svg flex flex-col items-center justify-center p-6 relative"
+              class="nav-button-svg flex flex-col items-center justify-center relative"
             >
               <img
                 src="/Pic/elements/catch.svg"
@@ -87,7 +87,7 @@ import { RouterLink } from 'vue-router'
             <a
               href="https://www.baidu.com"
               target="_blank"
-              class="nav-button-svg flex flex-col items-center justify-center p-6"
+              class="nav-button-svg flex flex-col items-center justify-center"
             >
               <img
                 src="/Pic/elements/fight.svg"
@@ -147,15 +147,48 @@ import { RouterLink } from 'vue-router'
   transform: scale(1);
   transition: all 0.3s ease;
   position: relative;
+  text-decoration: none !important;
+  outline: none !important;
+  border: none !important;
+  background: none !important;
+  color: inherit !important;
+  padding: 1.5rem !important;
 }
 
 .nav-button-svg:hover {
   transform: scale(1.1) translateY(-2px);
+  text-decoration: none !important;
+  outline: none !important;
+  background: none !important;
+  color: inherit !important;
 }
 
 .nav-button-svg:active {
   transform: scale(1.05) translateY(0px);
   transition: all 0.1s ease;
+  text-decoration: none !important;
+  outline: none !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+.nav-button-svg:focus {
+  outline: none !important;
+  text-decoration: none !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+.nav-button-svg:visited {
+  text-decoration: none !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+.nav-button-svg:link {
+  text-decoration: none !important;
+  background: none !important;
+  color: inherit !important;
 }
 
 /* 背景图片加载优化 */
