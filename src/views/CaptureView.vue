@@ -249,7 +249,7 @@ const takePhoto = (): string | null => {
   return canvas.toDataURL('image/jpeg', 0.8)
 }
 
-// 调用虚拟API接口进行植宠识别
+// 调用真实API接口进行植宠生成
 const callPlantmonAPI = async (
   imageData: string,
 ): Promise<{
@@ -258,44 +258,83 @@ const callPlantmonAPI = async (
   error?: string
 }> => {
   try {
-    // 模拟API调用延迟
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    console.log('🚀 开始调用植宠生成API...')
 
-    // 模拟API请求（实际项目中这里会调用真实的后端接口）
-    await fetch('/api/plantmon/recognize', {
+    // 将base64图片数据转换为Blob文件
+    const base64Response = await fetch(imageData)
+    const blob = await base64Response.blob()
+
+    // 创建FormData对象上传文件
+    const formData = new FormData()
+    formData.append('image', blob, 'capture.jpg')
+
+    console.log('📤 正在上传图片到API...')
+
+    // 调用真实的植宠生成API（设置30秒超时）
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30秒超时
+
+    const response = await fetch('https://plantmonapi.zeabur.app/process', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image: imageData,
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {
-      // 模拟网络请求失败，使用本地逻辑
-      console.log('虚拟API调用失败，使用本地逻辑')
+      body: formData,
+      signal: controller.signal,
     })
 
-    // 由于是虚拟接口，这里使用本地逻辑生成结果
-    const isSuccess = Math.random() > 0.3 // 70%成功率
+    clearTimeout(timeoutId)
 
-    if (isSuccess) {
-      const newPlantmon = generateRandomPlantmon()
+    console.log('📡 API响应状态:', response.status)
+
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status} ${response.statusText}`)
+    }
+
+    const result = await response.json()
+    console.log('✅ API返回结果:', result)
+
+    // 检查API是否返回了image_url
+    if (result.image_url) {
+      // 使用API返回的图片URL生成植宠
+      const newPlantmon = generatePlantmonFromAPI(result.image_url)
+
       return {
         success: true,
         plantmon: newPlantmon,
       }
     } else {
+      // API未返回图片时，使用备用生成方式
+      console.log('⚠️ API未返回图片，使用备用生成方式')
+      const fallbackPlantmon = generateFallbackPlantmon()
+
       return {
-        success: false,
-        error: 'AI识别失败，未能从照片中识别出植宠特征，请尝试拍摄其他物体',
+        success: true,
+        plantmon: fallbackPlantmon,
       }
     }
   } catch (error) {
-    console.error('API调用失败:', error)
+    console.error('❌ API调用失败:', error)
+
+    // 根据错误类型提供更具体的错误信息
+    let errorMessage = '植宠生成失败，请重试'
+
+    if (error instanceof Error) {
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMessage = '网络连接失败，请检查网络设置后重试'
+      } else if (error.message.includes('400')) {
+        errorMessage = '图片格式不支持，请尝试拍摄清晰的照片'
+      } else if (error.message.includes('500')) {
+        errorMessage = '服务器处理失败，请稍后重试'
+      } else if (error.message.includes('timeout')) {
+        errorMessage = '请求超时，请检查网络连接后重试'
+      } else {
+        errorMessage = `生成失败: ${error.message}`
+      }
+    }
+
+    // API完全失败时，也可以选择使用备用生成方式
+    // 这里选择返回错误，让用户重试
     return {
       success: false,
-      error: '网络连接失败，请检查网络设置后重试',
+      error: errorMessage,
     }
   }
 }
@@ -346,8 +385,101 @@ const handleCapture = async () => {
   }
 }
 
-// 生成随机植宠数据（模拟AI识别结果）
-const generateRandomPlantmon = (): Plantmon => {
+// 根据API返回的图片URL生成植宠数据
+const generatePlantmonFromAPI = (imageUrl: string): Plantmon => {
+  const names = [
+    '星光守护者',
+    '月影精灵',
+    '烈焰战神',
+    '冰霜法师',
+    '暗夜刺客',
+    '森林之王',
+    '雷电领主',
+    '翡翠藤蔓',
+    '紫罗兰精灵',
+    '黄金花仙',
+    '银月草灵',
+    '赤焰花魔',
+    '碧海莲君',
+    '雪莲仙子',
+  ]
+
+  const attributePairs = [
+    ['光明', '守护'],
+    ['月亮', '精灵'],
+    ['火焰', '战士'],
+    ['冰霜', '法师'],
+    ['暗影', '刺客'],
+    ['自然', '王者'],
+    ['雷电', '领主'],
+    ['自然', '治愈'],
+    ['神秘', '精灵'],
+    ['光明', '花仙'],
+    ['月亮', '草灵'],
+    ['火焰', '花魔'],
+    ['水系', '莲君'],
+    ['冰霜', '仙子'],
+  ]
+
+  const descriptions = [
+    '来自星空的神秘守护者，拥有无穷的光明力量。',
+    '月夜中诞生的精灵，优雅而神秘。',
+    '战场上的烈焰之神，所向披靡。',
+    '掌控冰霜的智慧法师，冷静而强大。',
+    '隐匿在黑暗中的致命刺客。',
+    '森林的统治者，与自然和谐共生。',
+    '操控雷电的强大领主，威震四方。',
+    '拥有强大生命力的植宠，能够快速恢复自身和队友的生命值。',
+    '紫色花瓣中蕴含着神秘的魔法力量，擅长施展幻术。',
+    '金光闪闪的花朵仙子，带来财富和好运。',
+    '月光下闪烁的银色草灵，拥有净化心灵的能力。',
+    '燃烧着烈火的花之恶魔，攻击力极其强大。',
+    '生长在深海中的莲花君主，掌控水之力量。',
+    '来自雪山之巅的圣洁仙子，冰清玉洁。',
+  ]
+
+  // 根据图片URL或随机选择属性
+  const randomIndex = Math.floor(Math.random() * names.length)
+  const plantmonCount = plantmonStore.totalCount + 1
+
+  // 根据图片内容智能推测植宠类型（这里简化为随机，实际可以根据图片URL分析）
+  const skillNames = [
+    '自然治愈',
+    '光明守护',
+    '烈焰冲击',
+    '冰霜护盾',
+    '暗影突袭',
+    '雷电风暴',
+    '花瓣飞舞',
+    '藤蔓缠绕',
+    '毒刺攻击',
+    '光合作用',
+  ]
+
+  return {
+    id: `#${plantmonCount.toString().padStart(3, '0')}`,
+    name: names[randomIndex],
+    image: imageUrl, // 使用API返回的真实图片URL
+    attributes: attributePairs[randomIndex],
+    skills: [
+      {
+        name: skillNames[Math.floor(Math.random() * skillNames.length)],
+        description: '使用基本植物能力攻击敌人',
+        damage: Math.floor(Math.random() * 20) + 25,
+      },
+      {
+        name: skillNames[Math.floor(Math.random() * skillNames.length)],
+        description: '释放独特的植物属性技能',
+        damage: Math.floor(Math.random() * 30) + 35,
+      },
+    ],
+    description: descriptions[randomIndex],
+    isActive: false,
+  }
+}
+
+// 备用的随机植宠生成函数（API失败时使用）
+const generateFallbackPlantmon = (): Plantmon => {
   const availableImages = [
     '/Pic/roles/20250724-183408.png',
     '/Pic/roles/20250724-183436.png',
@@ -358,55 +490,22 @@ const generateRandomPlantmon = (): Plantmon => {
     '/Pic/roles/20250724-183519.png',
   ]
 
-  const names = [
-    '星光守护者',
-    '月影精灵',
-    '烈焰战神',
-    '冰霜法师',
-    '暗夜刺客',
-    '森林之王',
-    '雷电领主',
-  ]
-  const attributePairs = [
-    ['光明', '守护'],
-    ['月亮', '精灵'],
-    ['火焰', '战士'],
-    ['冰霜', '法师'],
-    ['暗影', '刺客'],
-    ['自然', '王者'],
-    ['雷电', '领主'],
-  ]
-  const descriptions = [
-    '来自星空的神秘守护者，拥有无穷的光明力量。',
-    '月夜中诞生的精灵，优雅而神秘。',
-    '战场上的烈焰之神，所向披靡。',
-    '掌控冰霜的智慧法师，冷静而强大。',
-    '隐匿在黑暗中的致命刺客。',
-    '森林的统治者，与自然和谐共生。',
-    '操控雷电的强大领主，威震四方。',
-  ]
-
-  const randomIndex = Math.floor(Math.random() * names.length)
+  const randomIndex = Math.floor(Math.random() * availableImages.length)
   const plantmonCount = plantmonStore.totalCount + 1
 
   return {
     id: `#${plantmonCount.toString().padStart(3, '0')}`,
-    name: names[randomIndex],
+    name: '神秘植宠',
     image: availableImages[randomIndex],
-    attributes: attributePairs[randomIndex],
+    attributes: ['未知', '神秘'],
     skills: [
       {
         name: '基础攻击',
         description: '使用基本能力攻击敌人',
         damage: Math.floor(Math.random() * 20) + 25,
       },
-      {
-        name: '特殊技能',
-        description: '释放独特的属性技能',
-        damage: Math.floor(Math.random() * 30) + 35,
-      },
     ],
-    description: descriptions[randomIndex],
+    description: '一个神秘的植宠，等待你的发现...',
     isActive: false,
   }
 }
@@ -513,7 +612,7 @@ onUnmounted(() => {
           <span class="text-xl">←</span>
           <span class="ml-2 text-sm font-medium">返回</span>
         </button>
-        <h1 class="text-lg font-bold text-white flex items-center">
+        <h1 class="text-lg font-bold text-white flex items-center font-chinese">
           <span class="text-xl mr-2">📸</span>
           拍照捕获
         </h1>
@@ -567,7 +666,7 @@ onUnmounted(() => {
           >
             <span class="text-4xl">{{ cameraError ? '⚠️' : '📷' }}</span>
           </div>
-          <p class="text-lg mb-2 font-medium">
+          <p class="text-lg mb-2 font-medium font-chinese">
             {{
               cameraError
                 ? '摄像头访问失败'
@@ -576,7 +675,7 @@ onUnmounted(() => {
                   : '正在启动摄像头...'
             }}
           </p>
-          <p class="text-sm text-gray-400 px-8 leading-relaxed">
+          <p class="text-sm text-gray-400 px-8 leading-relaxed font-chinese">
             {{
               cameraError ||
               (isRetrying
@@ -588,7 +687,7 @@ onUnmounted(() => {
           <button
             v-if="cameraError"
             @click="() => initCamera(true)"
-            class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full transition-colors duration-200"
+            class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full transition-colors duration-200 font-chinese"
             :disabled="isRetrying"
           >
             {{ isRetrying ? `重试中... (${retryCount}/${maxRetries})` : '重试' }}
@@ -637,8 +736,8 @@ onUnmounted(() => {
           >
             <span class="text-4xl">🧬</span>
           </div>
-          <p class="text-xl mb-2 font-bold">AI分析中...</p>
-          <p class="text-sm text-gray-400 mb-4">正在识别拍摄内容</p>
+          <p class="text-xl mb-2 font-bold font-chinese">AI生成中...</p>
+          <p class="text-sm text-gray-400 mb-4 font-chinese">正在将您的照片转化为独特的植宠</p>
           <div class="flex justify-center space-x-1">
             <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
             <div
@@ -677,8 +776,8 @@ onUnmounted(() => {
 
       <!-- 提示文字 -->
       <div class="text-center pb-4">
-        <p class="text-white/80 text-sm">
-          {{ isCapturing ? '请稍候...' : cameraReady ? '点击拍照' : '摄像头未就绪' }}
+        <p class="text-white/80 text-sm font-chinese">
+          {{ isCapturing ? '正在生成植宠...' : cameraReady ? '拍照生成植宠' : '摄像头未就绪' }}
         </p>
       </div>
     </div>
@@ -698,8 +797,8 @@ onUnmounted(() => {
           >
             <span class="text-4xl">🎉</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">捕获成功！</h2>
-          <p class="text-sm text-gray-500 mb-6">AI成功识别并生成了新的植宠伙伴</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2 font-chinese">生成成功！</h2>
+          <p class="text-sm text-gray-500 mb-6 font-chinese">AI成功为您生成了独特的植宠伙伴</p>
 
           <!-- 新植宠信息卡片 -->
           <div
@@ -718,13 +817,17 @@ onUnmounted(() => {
                 "
               />
             </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-1">{{ captureResult.plantmon.name }}</h3>
-            <p class="text-sm text-gray-500 mb-3 font-mono">{{ captureResult.plantmon.id }}</p>
+            <h3 class="text-lg font-bold text-gray-800 mb-1 font-chinese">
+              {{ captureResult.plantmon.name }}
+            </h3>
+            <p class="text-sm text-gray-500 mb-3 font-mono font-english">
+              {{ captureResult.plantmon.id }}
+            </p>
             <div class="flex flex-wrap gap-1 justify-center">
               <span
                 v-for="attr in captureResult.plantmon.attributes"
                 :key="attr"
-                class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium"
+                class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium font-chinese"
               >
                 {{ attr }}
               </span>
@@ -735,15 +838,15 @@ onUnmounted(() => {
           <div class="flex gap-3">
             <button
               @click="viewDetails"
-              class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+              class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 font-chinese"
             >
               查看详情
             </button>
             <button
               @click="continueCaptureCapture"
-              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl transition-all duration-200"
+              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl transition-all duration-200 font-chinese"
             >
-              继续捕捉
+              继续生成
             </button>
           </div>
         </div>
@@ -755,12 +858,14 @@ onUnmounted(() => {
           >
             <span class="text-4xl">😔</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">识别失败</h2>
-          <p class="text-sm text-gray-600 mb-6 leading-relaxed">{{ captureResult.error }}</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2 font-chinese">生成失败</h2>
+          <p class="text-sm text-gray-600 mb-6 leading-relaxed font-chinese">
+            {{ captureResult.error }}
+          </p>
 
           <button
             @click="closeModal"
-            class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+            class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 font-chinese"
           >
             重新尝试
           </button>

@@ -27,7 +27,7 @@ defineProps<{
       <!-- 出战状态指示器 -->
       <div v-if="plantmon.isActive" class="absolute top-2 right-2">
         <div
-          class="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center shadow-lg"
+          class="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center shadow-lg font-chinese"
         >
           <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
           出战中
@@ -37,23 +37,26 @@ defineProps<{
 
     <!-- 植宠信息 -->
     <div class="text-center">
-      <h3 class="font-bold text-gray-800 mb-1 text-lg">{{ plantmon.name }}</h3>
-      <p class="text-xs text-gray-500 mb-3 font-mono">{{ plantmon.id }}</p>
+      <h3 class="font-bold text-gray-800 mb-1 text-lg font-chinese">{{ plantmon.name }}</h3>
+      <p class="text-xs text-gray-500 mb-3 font-mono font-english">{{ plantmon.id }}</p>
 
       <!-- 属性标签 -->
       <div class="flex flex-wrap gap-1 justify-center mb-3">
         <span
           v-for="attr in plantmon.attributes.slice(0, 2)"
           :key="attr"
-          :class="['px-3 py-1 text-xs rounded-full font-medium', getAttributeColor(attr)]"
+          :class="[
+            'px-3 py-1 text-xs rounded-full font-medium font-chinese',
+            getAttributeColor(attr),
+          ]"
         >
           {{ attr }}
         </span>
       </div>
 
       <!-- 技能预览 -->
-      <div class="text-xs text-gray-600">
-        <span class="font-medium">{{ plantmon.skills.length }}</span> 个技能
+      <div class="text-xs text-gray-600 font-chinese">
+        <span class="font-medium font-english">{{ plantmon.skills.length }}</span> 个技能
       </div>
     </div>
   </div>

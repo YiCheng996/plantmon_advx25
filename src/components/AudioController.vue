@@ -35,7 +35,7 @@
           @input="setVolume"
           class="flex-1 h-1 bg-gray-300 rounded-lg appearance-none cursor-pointer"
         />
-        <span class="text-white text-xs">{{ Math.round(volume * 100) }}%</span>
+        <span class="text-white text-xs font-english">{{ Math.round(volume * 100) }}%</span>
       </div>
     </div>
   </div>

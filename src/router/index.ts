@@ -24,6 +24,16 @@ const router = createRouter({
       name: 'detail',
       component: () => import('../views/DetailView.vue'),
     },
+    {
+      path: '/font-test',
+      name: 'font-test',
+      component: () => import('../views/FontTestView.vue'),
+    },
+    {
+      path: '/font-debug',
+      name: 'font-debug',
+      component: () => import('../views/FontDebugView.vue'),
+    },
   ],
 })
 

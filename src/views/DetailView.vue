@@ -40,11 +40,11 @@ const goBack = () => {
     <div v-if="!plantmon" class="min-h-screen flex items-center justify-center">
       <div class="text-center">
         <div class="text-6xl mb-4">❌</div>
-        <h2 class="text-lg font-semibold text-gray-700 mb-2">植宠不存在</h2>
-        <p class="text-sm text-gray-500 mb-6">可能是链接错误或植宠已被删除</p>
+        <h2 class="text-lg font-semibold text-gray-700 mb-2 font-chinese">植宠不存在</h2>
+        <p class="text-sm text-gray-500 mb-6 font-chinese">可能是链接错误或植宠已被删除</p>
         <button
           @click="goBack"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-chinese"
         >
           返回
         </button>

@@ -45,13 +45,13 @@ const enableAudio = () => {
     >
       <div class="bg-white rounded-2xl p-6 m-4 max-w-sm text-center shadow-2xl">
         <div class="text-4xl mb-4">🎵</div>
-        <h3 class="text-lg font-bold text-gray-800 mb-2">启用背景音乐</h3>
-        <p class="text-sm text-gray-600 mb-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-2 font-chinese">启用背景音乐</h3>
+        <p class="text-sm text-gray-600 mb-6 font-chinese">
           点击下方按钮开始播放背景音乐，<br />获得更佳的游戏体验！
         </p>
         <button
           @click="enableAudio"
-          class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
+          class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg font-chinese"
         >
           🎶 启用音乐
         </button>

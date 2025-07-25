@@ -22,9 +22,9 @@ const plantmons = computed(() => plantmonStore.plantmons)
           class="flex items-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
         >
           <span class="text-xl">←</span>
-          <span class="ml-2 text-sm font-medium">返回</span>
+          <span class="ml-2 text-sm font-medium font-chinese">返回</span>
         </RouterLink>
-        <h1 class="text-lg font-bold text-gray-800 flex items-center">
+        <h1 class="text-lg font-bold text-gray-800 flex items-center font-chinese">
           <span class="text-xl mr-2">📚</span>
           植宠图鉴
         </h1>
@@ -47,19 +47,26 @@ const plantmons = computed(() => plantmonStore.plantmons)
               <span class="text-2xl text-white">📊</span>
             </div>
           </div>
-          <div class="text-3xl font-bold text-gray-800 mb-1">{{ plantmons.length }}</div>
-          <div class="text-sm text-gray-500 mb-2">已收集的植宠</div>
+          <div class="text-3xl font-bold text-gray-800 mb-1 font-english">
+            {{ plantmons.length }}
+          </div>
+          <div class="text-sm text-gray-500 mb-2 font-chinese">已收集的植宠</div>
           <div class="flex items-center justify-center space-x-4 text-xs text-gray-400">
-            <span
+            <span class="font-chinese"
               >🔥 战力总值:
-              {{
+              <span class="font-english">{{
                 plantmons.reduce(
                   (sum, p) => sum + p.skills.reduce((s, skill) => s + (skill.damage || 0), 0),
                   0,
                 )
-              }}</span
+              }}</span></span
             >
-            <span>⚡ 技能总数: {{ plantmons.reduce((sum, p) => sum + p.skills.length, 0) }}</span>
+            <span class="font-chinese"
+              >⚡ 技能总数:
+              <span class="font-english">{{
+                plantmons.reduce((sum, p) => sum + p.skills.length, 0)
+              }}</span></span
+            >
           </div>
         </div>
       </div>
@@ -67,8 +74,8 @@ const plantmons = computed(() => plantmonStore.plantmons)
       <!-- 植宠网格列表 -->
       <div v-if="plantmons.length > 0" class="space-y-4">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-800">我的植宠</h2>
-          <div class="text-sm text-gray-500">点击查看详情</div>
+          <h2 class="text-lg font-bold text-gray-800 font-chinese">我的植宠</h2>
+          <div class="text-sm text-gray-500 font-chinese">点击查看详情</div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
