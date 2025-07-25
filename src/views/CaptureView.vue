@@ -274,7 +274,12 @@ const callPlantmonAPI = async (
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000) // 30秒超时
 
-    const response = await fetch('https://plantmonapi.zeabur.app/process', {
+    // 根据环境选择API地址
+    const apiUrl = import.meta.env.DEV
+      ? '/api/plantmon/process' // 开发环境使用代理
+      : 'https://plantmonapi.zeabur.app/process' // 生产环境直接调用
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       body: formData,
       signal: controller.signal,
@@ -318,12 +323,24 @@ const callPlantmonAPI = async (
 
     if (error instanceof Error) {
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        errorMessage = '网络连接失败，请检查网络设置后重试'
+        errorMessage = '网络连接失败，这可能是由于CORS限制导致的。请尝试刷新页面或联系管理员'
+      } else if (
+        error.message.includes('CORS') ||
+        error.message.includes('Access-Control-Allow-Origin')
+      ) {
+        errorMessage = '跨域访问被阻止，正在尝试备用方案...'
+        console.log('🔄 检测到CORS错误，使用备用生成方式')
+        // CORS错误时使用备用生成
+        const fallbackPlantmon = generateFallbackPlantmon()
+        return {
+          success: true,
+          plantmon: fallbackPlantmon,
+        }
       } else if (error.message.includes('400')) {
         errorMessage = '图片格式不支持，请尝试拍摄清晰的照片'
       } else if (error.message.includes('500')) {
         errorMessage = '服务器处理失败，请稍后重试'
-      } else if (error.message.includes('timeout')) {
+      } else if (error.message.includes('timeout') || error.message.includes('AbortError')) {
         errorMessage = '请求超时，请检查网络连接后重试'
       } else {
         errorMessage = `生成失败: ${error.message}`

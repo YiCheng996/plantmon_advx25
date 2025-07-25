@@ -128,13 +128,13 @@ const activePlantmon = computed(() => plantmonStore.activePlantmon)
               <div class="text-sm font-bold font-chinese">植宠图鉴</div>
             </RouterLink>
 
-            <!-- 字体测试按钮 -->
+            <!-- 调试工具按钮 -->
             <RouterLink
-              to="/font-test"
+              to="/font-debug"
               class="nav-button bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
             >
-              <div class="text-3xl mb-2">🎨</div>
-              <div class="text-sm font-bold font-chinese">字体测试</div>
+              <div class="text-3xl mb-2">🔧</div>
+              <div class="text-sm font-bold font-chinese">调试工具</div>
             </RouterLink>
           </div>
         </div>
