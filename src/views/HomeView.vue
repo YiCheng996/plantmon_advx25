@@ -24,12 +24,12 @@ import { RouterLink } from 'vue-router'
     <!-- 内容容器 -->
     <div class="relative z-10 flex flex-col h-screen">
       <!-- 顶部Logo区域 -->
-      <header class="pt-12 pb-6 text-center">
+      <header class="pt-6 pb-6 text-center">
         <div class="flex items-center justify-center">
           <img
             src="/Pic/scenes/logo.svg"
             alt="Plantmon Logo"
-            class="h-60 w-auto drop-shadow-2xl"
+            class="h-50 w-auto drop-shadow-2xl"
             @error="($event.target as HTMLImageElement).style.display = 'none'"
           />
         </div>
