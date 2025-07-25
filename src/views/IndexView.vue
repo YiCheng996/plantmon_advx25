@@ -21,8 +21,8 @@ const plantmons = computed(() => plantmonStore.plantmons)
           to="/"
           class="flex items-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
         >
-          <span class="text-xl">←</span>
-          <span class="ml-2 text-sm font-medium font-chinese">返回</span>
+          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-5 h-5 mr-2" />
+          <span class="text-sm font-medium font-chinese">返回</span>
         </RouterLink>
         <h1 class="text-lg font-bold text-gray-800 flex items-center font-chinese">
           <span class="text-xl mr-2">📚</span>

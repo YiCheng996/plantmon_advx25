@@ -22,6 +22,8 @@ const retryCount = ref(0)
 const maxRetries = 3
 // 添加摄像头朝向状态
 const currentFacingMode = ref<'user' | 'environment'>('environment')
+// 添加引导图显示状态
+const showGuide = ref(true)
 
 const captureResult = ref<{
   success: boolean
@@ -605,6 +607,11 @@ onMounted(async () => {
   // 确保DOM完全加载后再初始化摄像头
   await new Promise((resolve) => setTimeout(resolve, 100))
   initCamera()
+
+  // 3秒后隐藏引导图
+  setTimeout(() => {
+    showGuide.value = false
+  }, 3000)
 })
 
 onUnmounted(() => {
@@ -626,8 +633,8 @@ onUnmounted(() => {
           @click="goHome"
           class="flex items-center text-white hover:text-gray-300 transition-colors duration-200"
         >
-          <span class="text-xl">←</span>
-          <span class="ml-2 text-sm font-medium">返回</span>
+          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-6 h-6 mr-2" />
+          <span class="text-sm font-medium">返回</span>
         </button>
         <h1 class="text-lg font-bold text-white flex items-center font-chinese">
           <span class="text-xl mr-2">📸</span>
@@ -639,7 +646,7 @@ onUnmounted(() => {
           @click="switchCamera"
           class="flex items-center text-white hover:text-gray-300 transition-colors duration-200"
         >
-          <span class="text-xl">🔄</span>
+          <img src="/Pic/elements/Refresh cw.svg" alt="翻转摄像头" class="w-6 h-6" />
         </button>
         <div v-else class="w-8"></div>
       </div>
@@ -712,8 +719,26 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- 引导图层 -->
+      <div
+        v-if="showGuide && cameraReady"
+        class="absolute inset-0 flex flex-col items-center justify-center z-15 pointer-events-none transition-opacity duration-1000"
+        :class="{ 'opacity-0': !showGuide }"
+      >
+        <!-- 引导图 -->
+        <div class="mb-4">
+          <img src="/Pic/elements/guide.svg" alt="拍照引导" class="w-64 h-64 object-contain" />
+        </div>
+        <!-- 提示文字 -->
+        <p
+          class="text-white text-lg font-medium font-chinese bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm"
+        >
+          瞄准植物拍照捕获
+        </p>
+      </div>
+
       <!-- 拍照边框装饰 -->
-      <div v-if="cameraReady" class="scan-frame absolute inset-6 pointer-events-none">
+      <div v-if="cameraReady && !showGuide" class="scan-frame absolute inset-6 pointer-events-none">
         <!-- 四角扫描框 -->
         <div class="relative w-full h-full border-2 border-transparent">
           <!-- 左上角 -->
@@ -772,30 +797,49 @@ onUnmounted(() => {
 
     <!-- 底部拍照按钮区域 -->
     <div
-      class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent"
+      class="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 to-transparent"
     >
-      <div class="flex justify-center pb-8 pt-4">
-        <button
-          @click="handleCapture"
-          :disabled="isCapturing || !cameraReady"
-          class="capture-button relative w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 disabled:from-gray-500 disabled:to-gray-600 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 disabled:hover:scale-100 transition-all duration-200"
-        >
-          <!-- 外圈动画 -->
+      <div class="flex justify-center pb-12 pt-8">
+        <!-- 统一的拍照按钮 -->
+        <div class="relative">
+          <!-- 外圈装饰 -->
           <div
             v-if="cameraReady && !isCapturing"
-            class="absolute -inset-2 bg-gradient-to-r from-yellow-400/30 to-orange-500/30 rounded-full animate-ping"
+            class="absolute -inset-6 rounded-full border-2 border-white/20 animate-pulse"
           ></div>
-          <span class="text-4xl relative z-10">{{
-            isCapturing ? '⏳' : cameraReady ? '📸' : '⚠️'
-          }}</span>
-        </button>
-      </div>
+          <div
+            v-if="cameraReady && !isCapturing"
+            class="absolute -inset-3 rounded-full bg-gradient-to-r from-orange-400/20 to-green-400/20 animate-ping"
+          ></div>
 
-      <!-- 提示文字 -->
-      <div class="text-center pb-4">
-        <p class="text-white/80 text-sm font-chinese">
-          {{ isCapturing ? '正在生成植宠...' : cameraReady ? '拍照生成植宠' : '摄像头未就绪' }}
-        </p>
+          <!-- 主按钮 -->
+          <button
+            @click="handleCapture"
+            :disabled="isCapturing || !cameraReady"
+            class="capture-button relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 disabled:hover:scale-100 transition-all duration-200 disabled:opacity-50"
+          >
+            <!-- 拍照图标 -->
+            <img
+              src="/Pic/elements/catch.svg"
+              alt="拍照捕获"
+              class="w-full h-full object-contain"
+              :class="{
+                'animate-pulse': isCapturing,
+                'opacity-50': !cameraReady,
+              }"
+            />
+
+            <!-- 拍照中的遮罩层 -->
+            <div
+              v-if="isCapturing"
+              class="absolute inset-0 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"
+            >
+              <div
+                class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -914,11 +958,6 @@ onUnmounted(() => {
   }
 }
 
-/* 拍照按钮样式 */
-.capture-button:active {
-  transform: scale(0.95);
-}
-
 /* 边框粗细 */
 .border-t-3 {
   border-top-width: 3px;
@@ -986,5 +1025,28 @@ onUnmounted(() => {
 .scan-frame {
   /* 确保扫描框不会被视频遮挡 */
   z-index: 10;
+}
+
+/* 引导图渐隐动画 */
+.guide-fade-out {
+  animation: fadeOut 1s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 统一拍照按钮样式 */
+.capture-button:active {
+  transform: scale(0.95);
+}
+
+.capture-button:disabled {
+  cursor: not-allowed;
 }
 </style>

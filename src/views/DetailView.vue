@@ -44,8 +44,13 @@ const goBack = () => {
         <p class="text-sm text-gray-500 mb-6 font-chinese">可能是链接错误或植宠已被删除</p>
         <button
           @click="goBack"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-chinese"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-chinese flex items-center"
         >
+          <img
+            src="/Pic/elements/Arrow left.svg"
+            alt="返回"
+            class="w-4 h-4 mr-2 brightness-0 invert"
+          />
           返回
         </button>
       </div>
@@ -57,8 +62,8 @@ const goBack = () => {
       <header class="bg-white shadow-sm sticky top-0 z-10">
         <div class="flex items-center justify-between p-4">
           <button @click="goBack" class="flex items-center text-gray-600 hover:text-gray-800">
-            <span class="text-xl">←</span>
-            <span class="ml-2 text-sm">返回</span>
+            <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-5 h-5 mr-2" />
+            <span class="text-sm">返回</span>
           </button>
           <h1 class="text-lg font-semibold text-gray-800">植宠详情</h1>
           <div class="w-12"></div>
