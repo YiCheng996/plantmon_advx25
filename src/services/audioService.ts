@@ -63,9 +63,9 @@ class AudioService {
         this.userInteractionRequired = false
       }
     } catch (error) {
-      console.warn('⚠️ 自动播放被浏览器阻止，等待用户交互:', error)
+      console.warn('⚠️ 自动播放被浏览器阻止，将在用户交互时自动播放:', error)
       this.userInteractionRequired = true
-      // 浏览器阻止自动播放时，等待用户交互
+      // 浏览器阻止自动播放时，静默等待用户交互
       this.setupUserInteractionListener()
     }
   }

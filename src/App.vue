@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { audioService } from '@/services/audioService'
 import AudioController from '@/components/AudioController.vue'
-
-// 用户交互提示状态
-const showAudioPrompt = ref(false)
 
 // 组件挂载时初始化并播放背景音乐
 onMounted(() => {
@@ -14,50 +11,17 @@ onMounted(() => {
 
   // 尝试播放背景音乐
   audioService.play()
-
-  // 检查是否需要用户交互
-  setTimeout(() => {
-    if (audioService.needsUserInteraction()) {
-      showAudioPrompt.value = true
-    }
-  }, 1000)
 })
 
 // 组件卸载时暂停音乐
 onUnmounted(() => {
   audioService.pause()
 })
-
-// 处理用户点击启用音频
-const enableAudio = () => {
-  audioService.play()
-  showAudioPrompt.value = false
-}
 </script>
 
 <template>
   <!-- 移动端优先的应用容器 -->
   <div class="app-container">
-    <!-- 音频启用提示 -->
-    <div
-      v-if="showAudioPrompt"
-      class="audio-prompt fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-    >
-      <div class="bg-white rounded-2xl p-6 m-4 max-w-sm text-center shadow-2xl">
-        <div class="text-4xl mb-4">🎵</div>
-        <h3 class="text-lg font-bold text-gray-800 mb-2 font-chinese">启用背景音乐</h3>
-        <p class="text-sm text-gray-600 mb-6 font-chinese">
-          点击下方按钮开始播放背景音乐，<br />获得更佳的游戏体验！
-        </p>
-        <button
-          @click="enableAudio"
-          class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg font-chinese"
-        >
-          🎶 启用音乐
-        </button>
-      </div>
-    </div>
-
     <!-- 音频控制器 -->
     <AudioController />
     <RouterView />
