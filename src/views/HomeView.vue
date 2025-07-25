@@ -85,7 +85,7 @@ import { RouterLink } from 'vue-router'
 
             <!-- 战斗按钮（右侧） -->
             <a
-              href="https://www.pokemon.com/us"
+              href="https://plantmonfight.zeabur.app/"
               target="_blank"
               class="nav-button-svg flex flex-col items-center justify-center"
             >
