@@ -48,9 +48,9 @@ import { RouterLink } from 'vue-router'
       </div>
 
       <!-- 底部导航按钮区域 -->
-      <div class="pb-8 px-6">
-        <div class="p-6">
-          <div class="flex justify-center items-center gap-8">
+      <div class="pb-8">
+        <div class="p-1">
+          <div class="flex justify-center items-center">
             <!-- 图鉴按钮（左侧） -->
             <RouterLink
               to="/index"
@@ -73,7 +73,7 @@ import { RouterLink } from 'vue-router'
               <img
                 src="/Pic/elements/catch.svg"
                 alt="捕捉植宠"
-                class="w-28 h-28 drop-shadow-2xl"
+                class="w-34 h-34 drop-shadow-2xl"
                 @error="($event.target as HTMLImageElement).style.display = 'none'"
               />
               <div class="text-base font-chinese text-white font-bold mt-3">捕捉</div>
@@ -152,7 +152,7 @@ import { RouterLink } from 'vue-router'
   border: none !important;
   background: none !important;
   color: inherit !important;
-  padding: 1.5rem !important;
+  padding: 1.2rem !important;
 }
 
 .nav-button-svg:hover {
