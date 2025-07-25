@@ -2,7 +2,6 @@
 import { RouterView } from 'vue-router'
 import { onMounted, onUnmounted } from 'vue'
 import { audioService } from '@/services/audioService'
-import AudioController from '@/components/AudioController.vue'
 
 // 组件挂载时初始化并播放背景音乐
 onMounted(() => {
@@ -13,17 +12,15 @@ onMounted(() => {
   audioService.play()
 })
 
-// 组件卸载时暂停音乐
+// 组件卸载时销毁音频服务
 onUnmounted(() => {
-  audioService.pause()
+  audioService.destroy()
 })
 </script>
 
 <template>
   <!-- 移动端优先的应用容器 -->
   <div class="app-container">
-    <!-- 音频控制器 -->
-    <AudioController />
     <RouterView />
   </div>
 </template>

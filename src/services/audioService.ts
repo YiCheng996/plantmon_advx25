@@ -4,7 +4,6 @@
 class AudioService {
   private audio: HTMLAudioElement | null = null
   private isInitialized = false
-  private isPaused = false
   private userInteractionRequired = false
 
   /**
@@ -38,9 +37,7 @@ class AudioService {
 
     // 监听音频结束事件（虽然是循环播放，但作为备用）
     this.audio.addEventListener('ended', () => {
-      if (!this.isPaused) {
-        this.play()
-      }
+      this.play()
     })
 
     this.isInitialized = true
@@ -54,9 +51,6 @@ class AudioService {
       this.init()
     }
 
-    // 如果已暂停，不播放
-    if (this.isPaused) return
-
     try {
       if (this.audio) {
         await this.audio.play()
@@ -67,26 +61,6 @@ class AudioService {
       this.userInteractionRequired = true
       // 浏览器阻止自动播放时，静默等待用户交互
       this.setupUserInteractionListener()
-    }
-  }
-
-  /**
-   * 暂停背景音乐
-   */
-  pause() {
-    if (this.audio) {
-      this.audio.pause()
-      this.isPaused = true
-    }
-  }
-
-  /**
-   * 恢复播放
-   */
-  resume() {
-    if (this.audio && this.isPaused) {
-      this.isPaused = false
-      this.play()
     }
   }
 
@@ -126,7 +100,7 @@ class AudioService {
    */
   private setupUserInteractionListener() {
     const playOnInteraction = () => {
-      if (this.audio && !this.isPaused) {
+      if (this.audio) {
         this.audio
           .play()
           .then(() => {
@@ -157,7 +131,6 @@ class AudioService {
       this.audio = null
     }
     this.isInitialized = false
-    this.isPaused = false
     this.userInteractionRequired = false
   }
 }

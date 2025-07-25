@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlantmonStore } from '@/store/plantmon'
 
@@ -15,6 +15,9 @@ const plantmon = computed(() => plantmonStore.getPlantmonById(plantmonId))
 
 // 检查是否为当前出战植宠
 const isActive = computed(() => plantmon.value?.isActive || false)
+
+// 当前激活的标签页
+const activeTab = ref('details')
 
 // 设为出战
 const toggleActive = () => {
@@ -32,142 +35,712 @@ const toggleActive = () => {
 const goBack = () => {
   router.back()
 }
+
+// 切换标签页
+const setActiveTab = (tab: string) => {
+  activeTab.value = tab
+}
+
+// 计算属性进度条填充数量（基于1-100的值）
+const getProgressFill = (value: number) => {
+  // 将1-100的值转换为1-15个进度段
+  return Math.ceil((value / 100) * 15)
+}
+
+// 模拟属性数据（后续将从API获取）
+const attributeData = computed(() => [
+  { name: '攻击力', value: 68, icon: 'damage' },
+  { name: '防御力', value: 45, icon: 'shield-shaded' },
+  { name: '速度', value: 82, icon: 'move' },
+  { name: '生命值', value: 55, icon: 'HP' },
+  { name: '魔法', value: 73, icon: 'lightning' },
+])
 </script>
 
 <template>
-  <div class="detail-page min-h-screen bg-gray-50">
+  <div class="screen">
     <!-- 如果植宠不存在，显示错误页面 -->
-    <div v-if="!plantmon" class="min-h-screen flex items-center justify-center">
-      <div class="text-center">
-        <div class="text-6xl mb-4">❌</div>
-        <h2 class="text-lg font-semibold text-gray-700 mb-2 font-chinese">植宠不存在</h2>
-        <p class="text-sm text-gray-500 mb-6 font-chinese">可能是链接错误或植宠已被删除</p>
-        <button
-          @click="goBack"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors duration-200 font-chinese flex items-center"
-        >
-          <img
-            src="/Pic/elements/Arrow left.svg"
-            alt="返回"
-            class="w-4 h-4 mr-2 brightness-0 invert"
-          />
+    <div v-if="!plantmon" class="error-container">
+      <div class="error-content">
+        <div class="error-emoji">❌</div>
+        <h2 class="error-title">植宠不存在</h2>
+        <p class="error-message">可能是链接错误或植宠已被删除</p>
+        <button @click="goBack" class="error-button">
+          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="error-button-icon" />
           返回
         </button>
       </div>
     </div>
 
     <!-- 植宠详情内容 -->
-    <div v-else>
+    <div v-else class="detail-container">
+      <!-- 背景图片 -->
+      <img class="background-image" alt="" src="/Pic/scenes/detailback.jpg" />
+
+      <!-- 圆形渐变背景 -->
+      <div class="circle-gradient"></div>
+
+      <!-- 半透明容器 -->
+      <div class="content-container"></div>
+
       <!-- 顶部导航栏 -->
-      <header class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="flex items-center justify-between p-4">
-          <button @click="goBack" class="flex items-center text-gray-600 hover:text-gray-800">
-            <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-5 h-5 mr-2" />
-            <span class="text-sm">返回</span>
-          </button>
-          <h1 class="text-lg font-semibold text-gray-800">植宠详情</h1>
-          <div class="w-12"></div>
-          <!-- 占位，保持标题居中 -->
+      <div class="top-nav-bar">
+        <button @click="goBack" class="back-button">
+          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="back-icon" />
+        </button>
+        <div class="nav-title-wrapper">
+          <div class="nav-title">植宠生成</div>
         </div>
-      </header>
+      </div>
 
-      <!-- 植宠主要信息区域 -->
-      <div class="bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 p-6 text-white">
-        <!-- 植宠图片 -->
-        <div class="text-center mb-4">
-          <div
-            class="w-32 h-32 bg-white bg-opacity-20 rounded-full overflow-hidden mx-auto mb-4 flex items-center justify-center"
-          >
-            <img
-              :src="plantmon.image"
-              :alt="plantmon.name"
-              class="w-full h-full object-cover"
-              @error="
-                ($event.target as HTMLImageElement).src =
-                  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
-              "
-            />
+      <!-- 植宠等级 -->
+      <div class="rarity-badge">{{ plantmon.rarity || 'SSSR' }}</div>
+
+      <!-- 植宠图片 -->
+      <img
+        class="plantmon-image"
+        :src="plantmon.image"
+        :alt="plantmon.name"
+        @error="
+          ($event.target as HTMLImageElement).src =
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
+        "
+      />
+
+      <!-- 植宠名称 -->
+      <div class="plantmon-name">{{ plantmon.name }}</div>
+      <div class="plantmon-subtitle">{{ plantmon.id }}</div>
+
+      <!-- 标签页导航 -->
+      <div class="tab-navigation">
+        <div
+          @click="setActiveTab('details')"
+          :class="['tab-item', { 'tab-active': activeTab === 'details' }]"
+        >
+          <div class="tab-text">详情</div>
+        </div>
+        <div
+          @click="setActiveTab('attributes')"
+          :class="['tab-item', { 'tab-active': activeTab === 'attributes' }]"
+        >
+          <div class="tab-text">属性</div>
+        </div>
+        <div
+          @click="setActiveTab('skills')"
+          :class="['tab-item', { 'tab-active': activeTab === 'skills' }]"
+        >
+          <div class="tab-text">技能</div>
+        </div>
+      </div>
+
+      <!-- 标签页内容区域 -->
+      <div class="tab-content">
+        <!-- 详情标签页 -->
+        <div v-if="activeTab === 'details'" class="details-content">
+          <!-- 描述信息 -->
+          <div class="description-box">
+            <div class="description-text">
+              {{ plantmon.description }}
+            </div>
           </div>
+        </div>
 
-          <!-- 基本信息 -->
-          <h2 class="text-2xl font-bold mb-1">{{ plantmon.name }}</h2>
-          <p class="text-white text-opacity-80 mb-3">{{ plantmon.id }}</p>
+        <!-- 属性标签页 -->
+        <div v-if="activeTab === 'attributes'" class="attributes-content">
+          <div class="attribute-bars">
+            <div v-for="attr in attributeData" :key="attr.name" class="attribute-bar">
+              <div class="attribute-icon-wrapper">
+                <img
+                  :src="`/Pic/elements/${attr.icon}.svg`"
+                  :alt="attr.name"
+                  class="attribute-icon-img"
+                />
+              </div>
+              <div class="attribute-progress-container">
+                <div class="progress-bar-frame">
+                  <div v-for="segment in 15" :key="segment" class="progress-segment-wrapper">
+                    <div
+                      :class="[
+                        'progress-segment-rect',
+                        segment <= getProgressFill(attr.value) ? 'filled' : 'empty',
+                      ]"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <!-- 属性标签 -->
-          <div class="flex flex-wrap gap-2 justify-center">
-            <span
-              v-for="attr in plantmon.attributes"
-              :key="attr"
-              class="px-3 py-1 bg-white bg-opacity-20 text-white text-sm rounded-full"
-            >
-              {{ attr }}
-            </span>
+        <!-- 技能标签页 -->
+        <div v-if="activeTab === 'skills'" class="skills-content">
+          <div class="skills-list">
+            <div v-for="skill in plantmon.skills" :key="skill.name" class="skill-item">
+              <div class="skill-header">
+                <h4 class="skill-name">{{ skill.name }}</h4>
+                <span v-if="skill.damage" class="skill-damage"> {{ skill.damage }} 伤害 </span>
+              </div>
+              <p class="skill-description">{{ skill.description }}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 详细信息区域 -->
-      <div class="p-4 space-y-4">
-        <!-- 描述信息 -->
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3">📖 介绍</h3>
-          <p class="text-gray-600 leading-relaxed">{{ plantmon.description }}</p>
-        </div>
-
-        <!-- 技能信息 -->
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3">⚡ 技能</h3>
-          <div class="space-y-3">
-            <div
-              v-for="skill in plantmon.skills"
-              :key="skill.name"
-              class="border border-gray-200 rounded-lg p-3"
-            >
-              <div class="flex justify-between items-start mb-2">
-                <h4 class="font-semibold text-gray-800">{{ skill.name }}</h4>
-                <span
-                  v-if="skill.damage"
-                  class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
-                >
-                  {{ skill.damage }} 伤害
-                </span>
-              </div>
-              <p class="text-sm text-gray-600">{{ skill.description }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 出战状态控制 -->
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3">⚔️ 出战状态</h3>
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600">
-                {{ isActive ? '当前植宠正在出战中' : '设置此植宠为出战状态' }}
-              </p>
-            </div>
-            <button
-              @click="toggleActive"
-              :class="[
-                'px-4 py-2 rounded-full font-semibold text-sm transition-colors duration-200',
-                isActive
-                  ? 'bg-green-100 text-green-800 cursor-default'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white',
-              ]"
-            >
-              {{ isActive ? '当前出战' : '设为出战' }}
-            </button>
-          </div>
-        </div>
+      <!-- 固定在底部的出战按钮 -->
+      <div class="battle-button-container">
+        <button @click="toggleActive" :class="['battle-button', { active: isActive }]">
+          {{ isActive ? '已出战' : '确认出战' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 详情页样式 */
-.detail-page {
-  /* 确保在移动端有正确的触摸反馈 */
-  -webkit-tap-highlight-color: transparent;
+/* 整体容器 */
+.screen {
+  background-color: #000000;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: 'DOUYUFont', sans-serif;
+  color: #fff;
+}
+
+/* 错误页面样式 */
+.error-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-content {
+  text-align: center;
+}
+
+.error-emoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 0.5rem;
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.error-button {
+  background-color: #ea580c;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  border: none;
+  cursor: pointer;
+}
+
+.error-button:hover {
+  background-color: #dc2626;
+}
+
+.error-button-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  filter: brightness(0) invert(1);
+}
+
+/* 详情容器 */
+.detail-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* 背景图片 */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  opacity: 0.6;
+  z-index: 1;
+}
+
+/* 圆形渐变背景 */
+.circle-gradient {
+  position: absolute;
+  top: 60px;
+  right: -40px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(36, 134, 42, 0.6), rgba(145, 162, 144, 0));
+  opacity: 0.8;
+  z-index: 2;
+}
+
+/* 半透明容器 */
+.content-container {
+  position: absolute;
+  top: 280px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 31px 31px 0 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 3;
+}
+
+/* 顶部导航栏 */
+.top-nav-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  z-index: 10;
+}
+
+.back-button {
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) saturate(100%) invert(45%) sepia(85%) saturate(2154%) hue-rotate(23deg)
+    brightness(101%) contrast(101%);
+}
+
+.nav-title-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  text-align: center;
+}
+
+/* 等级标识 */
+.rarity-badge {
+  position: absolute;
+  top: 295px;
+  left: 40px;
+  height: 24px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #fffa76 0%, #ff9e55 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  text-align: left;
+}
+
+/* 植宠图片 */
+.plantmon-image {
+  position: absolute;
+  top: 90px;
+  right: 40px;
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  z-index: 9;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* 植宠名称 */
+.plantmon-name {
+  position: absolute;
+  top: 325px;
+  left: 40px;
+  font-family: 'DOUYUFont', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  line-height: 30px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.plantmon-subtitle {
+  position: absolute;
+  top: 360px;
+  left: 40px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.5px;
+  color: #a8b3a8;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* 标签页导航 */
+.tab-navigation {
+  position: absolute;
+  top: 390px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.tab-item {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.tab-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.78px;
+  line-height: 18px;
+  text-transform: uppercase;
+  color: #757575;
+  transition: color 0.2s;
+  text-align: center;
+}
+
+.tab-active .tab-text {
+  color: #fff;
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background-color: #fff;
+}
+
+/* 标签页内容 */
+.tab-content {
+  position: absolute;
+  top: 440px;
+  left: 20px;
+  right: 20px;
+  bottom: 80px;
+  z-index: 10;
+  overflow-y: auto;
+}
+
+/* 详情内容 */
+.details-content {
+  padding: 20px;
+}
+
+.action-button {
+  display: block;
+  margin: 0 auto 20px;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #b5ff00 0%, #7cb800 100%);
+  border: 1px solid #b5ff00;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button.active {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+  border-color: #22c55e;
+  color: #fff;
+}
+
+.description-box {
+  background-color: rgba(10, 9, 13, 0.8);
+  border: 1px solid #b5ff00;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.description-text {
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  line-height: 22px;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* 属性内容 */
+.attributes-content {
+  padding: 20px 25px;
+}
+
+.attribute-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.attribute-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.attribute-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attribute-icon-img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+.attribute-progress-container {
+  flex: 1;
+}
+
+.progress-bar-frame {
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+  height: 20px;
+  gap: 2px;
+}
+
+.progress-segment-wrapper {
+  height: 20px;
+  position: relative;
+  width: 16px;
+}
+
+.progress-segment-rect {
+  height: 20px;
+  position: absolute;
+  width: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  top: 0;
+  left: 0;
+}
+
+.progress-segment-rect.filled {
+  background: linear-gradient(
+    135deg,
+    #ff9e55 0%,
+    #5de5ed 25%,
+    #7be76c 50%,
+    #fffd6d 75%,
+    #ff9e55 100%
+  );
+
+  /* 添加光泽效果 */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-segment-rect.empty {
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+
+  /* 暗色效果 */
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 1px rgba(255, 255, 255, 0.05);
+
+  /* 暗色边框 */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 技能内容 */
+.skills-content {
+  padding: 20px;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-item {
+  background-color: rgba(55, 65, 81, 0.5);
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 8px;
+}
+
+.skill-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.skill-damage {
+  padding: 2px 8px;
+  background-color: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 12px;
+  border-radius: 9999px;
+}
+
+.skill-description {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 固定在底部的出战按钮 */
+.battle-button-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  z-index: 10;
+}
+
+.battle-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #b5ff00 0%, #7cb800 100%);
+  border: 1px solid #b5ff00;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.battle-button.active {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+  border-color: #22c55e;
+  color: #fff;
+}
+
+.battle-button-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  filter: brightness(0) invert(1);
+}
+
+/* 响应式调整 */
+@media (max-width: 375px) {
+  .tab-navigation {
+    width: 280px;
+    gap: 15px;
+  }
+
+  .tab-item {
+    padding: 8px 15px;
+    min-width: 70px;
+  }
+
+  .battle-button-container {
+    width: 260px;
+  }
+
+  .rarity-badge {
+    left: 20px;
+  }
+
+  .plantmon-name {
+    left: 20px;
+  }
+
+  .plantmon-subtitle {
+    left: 20px;
+  }
+
+  .plantmon-image {
+    right: 20px;
+    width: 160px;
+    height: 160px;
+  }
+
+  .circle-gradient {
+    right: -60px;
+    width: 280px;
+    height: 280px;
+  }
 }
 </style>

@@ -7,6 +7,7 @@ export interface Plantmon {
   skills: Skill[] // 技能列表
   description: string // 背景故事或趣味描述
   isActive: boolean // 是否为当前出战植宠
+  rarity?: string // 稀有度等级，如 "SSSR", "SSR", "SR", "R", "N"
 }
 
 // 技能类型定义
@@ -21,4 +22,4 @@ export interface CaptureResult {
   success: boolean // 是否识别成功
   plantmon?: Plantmon // 成功时返回的植宠数据
   error?: string // 失败时的错误信息
-} 
+}
