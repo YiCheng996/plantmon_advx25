@@ -28,7 +28,7 @@ onMounted(async () => {
       class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 pointer-events-none"
     ></div>
     <!-- 顶部导航栏 -->
-    <header class="bg-black/90 backdrop-blur-md sticky top-0 z-20 relative">
+    <header class="sticky top-0 z-20 relative">
       <div class="flex items-center justify-between p-4">
         <RouterLink
           to="/"
@@ -36,11 +36,14 @@ onMounted(async () => {
         >
           <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-6 h-6" />
         </RouterLink>
-        <h1 class="text-lg font-bold text-white font-chinese">植宠图鉴</h1>
-        <div class="flex items-center text-sm text-gray-300 font-chinese">
-          已收集：<span class="font-bold text-yellow-400 ml-1">{{ plantmons.length }}</span>
-          <span v-if="plantmonStore.isLoading" class="ml-2 text-blue-400">加载中...</span>
+
+        <!-- 图鉴图标，居中显示 -->
+        <div class="flex-1 flex justify-center">
+          <img src="/Pic/elements/图鉴.svg" alt="植宠图鉴" class="h-8" />
         </div>
+
+        <div class="w-6"></div>
+        <!-- 占位元素，保持居中 -->
       </div>
     </header>
 
@@ -81,15 +84,25 @@ onMounted(async () => {
       </div>
 
       <!-- 植宠网格列表 -->
-      <div v-else-if="plantmons.length > 0" class="grid grid-cols-2 gap-4">
-        <RouterLink
-          v-for="plantmon in plantmons"
-          :key="plantmon.latin_name"
-          :to="`/detail/${encodeURIComponent(plantmon.latin_name)}`"
-          class="transform transition-all duration-200 hover:scale-[1.02] hover:z-10 relative"
-        >
-          <PlantmonCard :plantmon="plantmon" />
-        </RouterLink>
+      <div v-else-if="plantmons.length > 0" class="relative">
+        <!-- 图鉴边框 -->
+        <div class="pokedex-border">
+          <!-- 边框背景 -->
+          <div class="pokedex-border-bg"></div>
+          <!-- 渐变边框 -->
+          <div class="pokedex-border-gradient"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 relative z-10 p-4">
+          <RouterLink
+            v-for="plantmon in plantmons"
+            :key="plantmon.latin_name"
+            :to="`/detail/${encodeURIComponent(plantmon.latin_name)}`"
+            class="transform transition-all duration-200 hover:scale-[1.02] hover:z-10 relative"
+          >
+            <PlantmonCard :plantmon="plantmon" />
+          </RouterLink>
+        </div>
       </div>
 
       <!-- 空状态 -->
@@ -135,6 +148,68 @@ onMounted(async () => {
     /* 移动端使用scroll以避免性能问题 */
     background-attachment: scroll;
   }
+
+  /* 移动端调整边框位置和大小 */
+  .pokedex-border {
+    width: calc(100% - 2rem);
+    height: auto;
+    left: 1rem;
+    top: 0;
+    position: relative;
+    min-height: 400px;
+  }
+}
+
+/* 图鉴边框 */
+.pokedex-border {
+  position: absolute;
+  width: 420px;
+  height: 100%;
+  left: calc(50% - 420px / 2 + 0.5px);
+  top: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 边框背景 */
+.pokedex-border-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)),
+    linear-gradient(
+      180deg,
+      rgba(217, 217, 217, 0) 0%,
+      rgba(213, 156, 122, 0.26) 62.98%,
+      rgba(211, 139, 67, 0.6) 100%
+    );
+  box-shadow:
+    0px 4px 4px rgba(0, 0, 0, 0.25),
+    inset 0px 4px 6px rgba(255, 92, 0, 0.4);
+  backdrop-filter: blur(25px);
+  border-radius: 14px;
+}
+
+/* 渐变边框 */
+.pokedex-border-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0.13%;
+  background: linear-gradient(180deg, #ff9e55 0%, #5de5ed 33.65%, #7be76c 67.79%, #fffd6d 100%);
+  border-radius: 14px;
+  opacity: 0.8;
+  /* 创建边框效果 */
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  padding: 2px;
 }
 
 /* 卡片悬停效果 */

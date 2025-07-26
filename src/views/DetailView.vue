@@ -107,17 +107,12 @@ const attributeData = computed(() => [
 </script>
 
 <template>
-  <div
-    class="screen bg-black bg-cover bg-center bg-no-repeat relative"
-    style="background-image: url('/Pic/scenes/111.png')"
-  >
-    <!-- 背景遮罩层，增强内容可读性 -->
-    <div
-      class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 pointer-events-none"
-    ></div>
+  <div class="screen bg-black relative">
+    <!-- 背景图片 -->
+    <img class="background-image" alt="" src="/Pic/scenes/detailback.jpg" />
 
     <!-- 顶部导航栏 -->
-    <header class="bg-black/90 backdrop-blur-md sticky top-0 z-20 relative">
+    <header class="sticky top-0 z-20 relative">
       <div class="flex items-center justify-between p-4">
         <button
           @click="goBack"
@@ -148,9 +143,6 @@ const attributeData = computed(() => [
 
     <!-- 植宠详情内容 -->
     <div v-else class="detail-container relative z-10">
-      <!-- 背景图片 -->
-      <img class="background-image" alt="" src="/Pic/scenes/detailback.jpg" />
-
       <!-- 圆形渐变背景 -->
       <div class="circle-gradient"></div>
 
