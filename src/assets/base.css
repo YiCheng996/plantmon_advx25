@@ -1,17 +1,89 @@
-/* 字体面声明 - 斗鱼追光体2.0 */
+/* 字体声明 - 造字工房映力黑规体 */
 @font-face {
-  font-family: '优设标题黑';
-  src: url('/优设标题黑.ttf') format('truetype');
+  font-family: '造字工房映力黑规体';
+  src: url('/造字工房映力黑规体.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap; /* 优化字体加载性能 */
   unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF; /* 中文字符范围 */
 }
 
+/* 阿里巴巴普惠体字体声明 - 使用本地字体文件 */
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('/AlibabaPuHuiTi-3-55-Regular.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF, U+0020-007E;
+}
+
+/* 阿里巴巴普惠体 Medium */
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('/AlibabaPuHuiTi-3-65-Medium.ttf') format('truetype');
+  font-weight: 500; /* Medium */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF, U+0020-007E;
+}
+
+/* 阿里巴巴普惠体 SemiBold */
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('/AlibabaPuHuiTi-3-75-SemiBold.ttf') format('truetype');
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF, U+0020-007E;
+}
+
+/* 阿里巴巴普惠体西文 - Light */
+@font-face {
+  font-family: 'Alibaba Sans';
+  src: url('/AlibabaSans-Light.ttf') format('truetype');
+  font-weight: 300; /* Light */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
+/* 阿里巴巴普惠体西文 - Regular */
+@font-face {
+  font-family: 'Alibaba Sans';
+  src: url('/AlibabaSans-Regular.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
+/* 阿里巴巴普惠体西文 - Medium */
+@font-face {
+  font-family: 'Alibaba Sans';
+  src: url('/AlibabaSans-Medium.ttf') format('truetype');
+  font-weight: 500; /* Medium */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
+/* 阿里巴巴普惠体西文 - Bold */
+@font-face {
+  font-family: 'Alibaba Sans';
+  src: url('/AlibabaSans-Bold.ttf') format('truetype');
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
 /* 备用字体声明 - 确保在不同环境下都能正常工作 */
 @font-face {
-  font-family: 'DouYu ZhuiGuang Fallback';
-  src: local('Microsoft YaHei'), local('微软雅黑'), local('SimSun'), local('宋体');
+  font-family: 'Alibaba PuHuiTi Fallback';
+  src:
+    local('PingFang SC'), local('Microsoft YaHei'), local('微软雅黑'), local('SimSun'),
+    local('宋体');
   font-weight: normal;
   font-style: normal;
   unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF;
@@ -86,15 +158,15 @@ body {
     background-color 0.5s;
   line-height: 1.6;
   font-family:
-    'DouYu ZhuiGuang',
-    'Roboto',
-    'DouYu ZhuiGuang Fallback',
+    'Alibaba PuHuiTi',
+    'Alibaba Sans',
+    'Alibaba PuHuiTi Fallback',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
+    'PingFang SC',
     'Microsoft YaHei',
     '微软雅黑',
-    'PingFang SC',
     'Hiragino Sans GB',
     'SimSun',
     '宋体',
@@ -104,5 +176,5 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* 设置默认字间距 - 适合中文显示 */
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }

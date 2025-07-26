@@ -4,17 +4,52 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // 中文字体 - 斗鱼追光体2.0
-        chinese: ['DouYu ZhuiGuang', 'Microsoft YaHei', '微软雅黑', 'SimSun', '宋体', 'sans-serif'],
-        // 英文字体 - Roboto
-        english: ['Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        // 混合字体 - 中英文混排
-        mixed: [
-          'DouYu ZhuiGuang',
-          'Roboto',
+        // 普通文字 - 阿里巴巴普惠体
+        body: [
+          'Alibaba PuHuiTi',
+          'PingFang SC',
+          'Microsoft YaHei',
+          '微软雅黑',
+          'SimSun',
+          '宋体',
+          'sans-serif',
+        ],
+        // 标题文字 - 造字工房映力黑规体
+        title: [
+          '造字工房映力黑规体',
+          'Alibaba PuHuiTi',
+          'PingFang SC',
+          'Microsoft YaHei',
+          '微软雅黑',
+          'sans-serif',
+        ],
+        // 中文字体 - 阿里巴巴普惠体（保持向后兼容）
+        chinese: [
+          'Alibaba PuHuiTi',
+          'PingFang SC',
+          'Microsoft YaHei',
+          '微软雅黑',
+          'SimSun',
+          '宋体',
+          'sans-serif',
+        ],
+        // 英文字体 - 阿里巴巴普惠体西文
+        english: [
+          'Alibaba Sans',
+          'Alibaba PuHuiTi',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
+          'sans-serif',
+        ],
+        // 混合字体 - 中英文混排
+        mixed: [
+          'Alibaba PuHuiTi',
+          'Alibaba Sans',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'PingFang SC',
           'Microsoft YaHei',
           '微软雅黑',
           'SimSun',
@@ -23,11 +58,12 @@ export default {
         ],
         // 默认字体
         sans: [
-          'DouYu ZhuiGuang',
-          'Roboto',
+          'Alibaba PuHuiTi',
+          'Alibaba Sans',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
+          'PingFang SC',
           'Microsoft YaHei',
           '微软雅黑',
           'SimSun',

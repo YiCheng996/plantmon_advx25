@@ -270,7 +270,7 @@ const attributeData = computed(() => [
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  font-family: 'DOUYUFont', sans-serif;
+  font-family: 'Alibaba PuHuiTi', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   color: #fff;
   /* 背景图像优化 */
   background-attachment: fixed;
@@ -398,7 +398,7 @@ const attributeData = computed(() => [
 }
 
 .nav-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: '造字工房映力黑规体', 'Alibaba PuHuiTi', sans-serif;
   font-size: 16px;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -413,7 +413,7 @@ const attributeData = computed(() => [
   top: 295px;
   left: 40px;
   height: 24px;
-  font-family: 'Roboto', sans-serif;
+  font-family: '造字工房映力黑规体', 'Alibaba PuHuiTi', sans-serif;
   font-size: 18px;
   font-weight: 700;
   line-height: 24px;
@@ -444,7 +444,8 @@ const attributeData = computed(() => [
   position: absolute;
   top: 325px;
   left: 40px;
-  font-family: 'DOUYUFont', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family:
+    '造字工房映力黑规体', 'Alibaba PuHuiTi', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: 1.5px;
@@ -460,7 +461,7 @@ const attributeData = computed(() => [
   position: absolute;
   top: 360px;
   left: 40px;
-  font-family: 'Roboto Mono', 'Consolas', monospace;
+  font-family: 'Alibaba PuHuiTi', 'PingFang SC', 'Microsoft YaHei', monospace;
   font-size: 14px;
   font-weight: 500;
   line-height: 18px;
@@ -476,7 +477,7 @@ const attributeData = computed(() => [
   position: absolute;
   top: 385px;
   left: 40px;
-  font-family: 'Roboto Mono', 'Consolas', monospace;
+  font-family: 'Alibaba Sans', 'Alibaba PuHuiTi', 'Consolas', monospace;
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
@@ -515,7 +516,7 @@ const attributeData = computed(() => [
 }
 
 .tab-text {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Alibaba PuHuiTi', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-size: 13px;
   font-weight: bold;
   letter-spacing: 0.78px;
@@ -589,7 +590,7 @@ const attributeData = computed(() => [
   letter-spacing: 0.04em;
   line-height: 22px;
   color: #fff;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Alibaba PuHuiTi', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 /* 属性内容 */
