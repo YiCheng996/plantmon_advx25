@@ -805,9 +805,10 @@ const attributeData = computed(() => [
   }
 
   .plantmon-image {
-    right: 20px;
-    width: 160px;
-    height: 160px;
+    left: 40px;
+    width: 450px;
+    height: 450px;
+    /* left: auto; 新增此行以解决安卓设备上的定位冲突 */
   }
 
   .circle-gradient {
