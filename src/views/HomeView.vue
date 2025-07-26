@@ -30,8 +30,49 @@ onMounted(async () => {
   }
 })
 
-// 外部对战链接（暂时设为空，后续由用户提供）
-// const battleUrl = 'https://example.com/battle'
+// 外部对战链接
+const battleUrl = 'https://plantmonfight.zeabur.app/'
+
+// 构建对战页面URL，携带植宠数据
+const buildBattleUrl = () => {
+  if (!activePlantmon.value) {
+    // 没有出战植宠时，直接跳转
+    return battleUrl
+  }
+
+  // 构建要传递的植宠数据
+  const battleData = {
+    plantmon: {
+      id: activePlantmon.value.id,
+      nickname: activePlantmon.value.nickname,
+      common_name: activePlantmon.value.common_name,
+      latin_name: activePlantmon.value.latin_name,
+      rarity: activePlantmon.value.rarity,
+      trait: activePlantmon.value.trait,
+      hp: activePlantmon.value.stats.hp,
+      attack: activePlantmon.value.stats.attack,
+      defense: activePlantmon.value.stats.defense,
+      speed: activePlantmon.value.stats.speed,
+      evasion: activePlantmon.value.stats.evasion,
+      skills: activePlantmon.value.skills,
+      image_url: plantmonImageUrl.value,
+      is_active: true,
+    },
+    timestamp: Date.now(),
+    source: 'plantmon_advx25',
+  }
+
+  // 将JSON数据编码为URL参数
+  const encodedData = encodeURIComponent(JSON.stringify(battleData))
+  return `${battleUrl}?data=${encodedData}`
+}
+
+// 处理战斗按钮点击
+const handleBattleClick = () => {
+  const url = buildBattleUrl()
+  console.log('跳转到战斗页面，携带数据:', url)
+  window.open(url, '_blank')
+}
 </script>
 
 <template>
@@ -182,9 +223,8 @@ onMounted(async () => {
             </RouterLink>
 
             <!-- 战斗按钮（右侧） -->
-            <a
-              href="https://plantmonfight.zeabur.app/"
-              target="_blank"
+            <button
+              @click="handleBattleClick"
               class="nav-button-svg flex flex-col items-center justify-center"
             >
               <img
@@ -194,7 +234,7 @@ onMounted(async () => {
                 @error="($event.target as HTMLImageElement).style.display = 'none'"
               />
               <div class="text-sm font-chinese text-white/90 mt-3">战斗</div>
-            </a>
+            </button>
           </div>
         </div>
       </div>

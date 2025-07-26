@@ -1,7 +1,7 @@
 /* 字体面声明 - 斗鱼追光体2.0 */
 @font-face {
-  font-family: 'DouYu ZhuiGuang';
-  src: url('/斗鱼追光体2.0.ttf') format('truetype');
+  font-family: '优设标题黑';
+  src: url('/优设标题黑.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap; /* 优化字体加载性能 */
@@ -103,4 +103,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 设置默认字间距 - 适合中文显示 */
+  letter-spacing: 2px;
 }

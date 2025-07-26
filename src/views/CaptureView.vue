@@ -684,7 +684,12 @@ onUnmounted(() => {
       class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-40 p-4"
     >
       <div
-        class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-white/20 transform animate-modal-in"
+        class="w-full max-w-sm transform animate-modal-in"
+        :class="{
+          'bg-white rounded-3xl p-6 shadow-2xl border border-white/20':
+            captureResult.success && captureResult.profile_json,
+          'bg-transparent p-0': !captureResult.success || !captureResult.profile_json,
+        }"
       >
         <!-- 成功结果 -->
         <div v-if="captureResult.success && captureResult.profile_json" class="text-center">
@@ -771,23 +776,58 @@ onUnmounted(() => {
         </div>
 
         <!-- 失败结果 -->
-        <div v-else class="text-center">
-          <div
-            class="w-20 h-20 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
-          >
-            <span class="text-4xl">😔</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2 font-chinese">生成失败</h2>
-          <p class="text-sm text-gray-600 mb-6 leading-relaxed font-chinese">
-            {{ captureResult.error }}
-          </p>
+        <div v-else class="svg-popup-container failure-popup">
+          <!-- SVG弹窗背景 -->
+          <img src="/Pic/elements/popup.svg" alt="弹窗背景" class="w-full h-full object-contain" />
 
+          <!-- 关闭按钮 -->
           <button
             @click="closeModal"
-            class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 font-chinese"
+            class="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center text-white hover:text-gray-200 transition-colors duration-200 bg-black/20 rounded-full backdrop-blur-sm hover:bg-black/30"
           >
-            重新尝试
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
+
+          <!-- 弹窗内容 -->
+          <div class="svg-popup-content">
+            <!-- 标题区域 -->
+            <div class="flex-shrink-0">
+              <h2 class="text-2xl font-bold text-white font-chinese drop-shadow-lg">生成失败</h2>
+            </div>
+
+            <!-- 错误信息区域 -->
+            <div class="flex-1 flex items-center justify-center px-2">
+              <p
+                class="text-base text-white/90 leading-relaxed font-chinese drop-shadow-md text-center"
+              >
+                {{ captureResult.error }}
+              </p>
+            </div>
+
+            <!-- 按钮区域 -->
+            <div class="flex-shrink-0">
+              <button
+                @click="closeModal"
+                class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 font-chinese shadow-lg"
+              >
+                重新尝试
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -906,5 +946,63 @@ onUnmounted(() => {
 
 .capture-button:disabled {
   cursor: not-allowed;
+}
+
+/* SVG弹窗样式 */
+.svg-popup-container {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  aspect-ratio: 319/221; /* 根据SVG的宽高比设置 */
+  margin: 0 auto;
+}
+
+.svg-popup-content {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  height: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+/* 失败弹窗专用样式 */
+.failure-popup {
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+  .svg-popup-container {
+    max-width: 280px;
+  }
+
+  .svg-popup-content {
+    width: 80%;
+    height: 70%;
+    padding: 1.5rem 0.75rem;
+    top: 18%;
+  }
+
+  .svg-popup-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .svg-popup-content p {
+    font-size: 0.875rem;
+    padding: 0 0.5rem;
+  }
+
+  .svg-popup-content button {
+    font-size: 0.875rem;
+    padding: 0.75rem 2rem;
+  }
 }
 </style>
