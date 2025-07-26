@@ -281,6 +281,7 @@ export const usePlantmonStore = defineStore('plantmon', {
             speed: 70,
           },
           image_url: '/Pic/roles/20250724-183408.png',
+          no_bg_image_url: '/Pic/roles/20250724-183408.png', // 添加去背图片URL
           isActive: false,
         },
         {
@@ -301,6 +302,7 @@ export const usePlantmonStore = defineStore('plantmon', {
             speed: 75,
           },
           image_url: '/Pic/roles/20250724-183436.png',
+          no_bg_image_url: '/Pic/roles/20250724-183436.png', // 添加去背图片URL
           isActive: false,
         },
       ]

@@ -43,24 +43,36 @@ export function getPlantmonImageUrl(
   plantmon: Plantmon | null,
   defaultUrl: string = '/Pic/scenes/starrole.webp',
 ): string {
-  if (!plantmon) return defaultUrl
+  if (!plantmon) {
+    console.log('植宠对象为空，使用默认图片')
+    return defaultUrl
+  }
+
+  // 调试信息：显示植宠的图片URL字段
+  console.log('植宠图片字段检查:', {
+    nickname: plantmon.nickname,
+    no_bg_image_url: plantmon.no_bg_image_url,
+    image_url: plantmon.image_url,
+    no_bg_exists: !!plantmon.no_bg_image_url,
+    image_exists: !!plantmon.image_url,
+  })
 
   // 优先使用去背图片
   if (plantmon.no_bg_image_url) {
     const transformedUrl = transformImageUrl(plantmon.no_bg_image_url)
-    console.log(`使用去背图片: ${transformedUrl}`)
+    console.log(`✅ 使用去背图片: ${transformedUrl}`)
     return transformedUrl
   }
 
   // 其次使用原始图片
   if (plantmon.image_url) {
     const transformedUrl = transformImageUrl(plantmon.image_url)
-    console.log(`使用原始图片: ${transformedUrl}`)
+    console.log(`⚠️ 使用原始图片（无去背图片）: ${transformedUrl}`)
     return transformedUrl
   }
 
   // 最后使用默认图片
-  console.log(`使用默认图片: ${defaultUrl}`)
+  console.log(`❌ 使用默认图片（无任何图片URL）: ${defaultUrl}`)
   return defaultUrl
 }
 
