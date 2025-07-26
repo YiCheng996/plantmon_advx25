@@ -2,6 +2,7 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlantmonStore } from '@/store/plantmon'
+import { getPlantmonImageUrl } from '@/utils/imageUtils'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,6 +13,9 @@ const latinName = decodeURIComponent(route.params.id as string)
 
 // 根据拉丁名称获取植宠数据
 const plantmon = computed(() => plantmonStore.getPlantmonByLatinName(latinName))
+
+// 获取植宠图片URL
+const plantmonImageUrl = computed(() => getPlantmonImageUrl(plantmon.value || null))
 
 // 加载状态
 const loading = ref(false)
@@ -133,9 +137,6 @@ const attributeData = computed(() => [
         <button @click="goBack" class="back-button">
           <img src="/Pic/elements/Arrow left.svg" alt="返回" class="back-icon" />
         </button>
-        <div class="nav-title-wrapper">
-          <div class="nav-title">植宠生成</div>
-        </div>
       </div>
 
       <!-- 植宠等级 -->
@@ -154,7 +155,7 @@ const attributeData = computed(() => [
       <!-- 植宠图片 -->
       <img
         class="plantmon-image"
-        :src="plantmon.no_bg_image_url || plantmon.image_url || '/Pic/roles/20250724-183408.png'"
+        :src="plantmonImageUrl"
         :alt="plantmon.nickname"
         @error="
           ($event.target as HTMLImageElement).src =
@@ -434,10 +435,10 @@ const attributeData = computed(() => [
 /* 植宠图片 */
 .plantmon-image {
   position: absolute;
-  top: 90px;
-  right: 40px;
-  width: 180px;
-  height: 180px;
+  top: 10px;
+  left: 40px;
+  width: 450px;
+  height: 450px;
   object-fit: contain;
   z-index: 9;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));

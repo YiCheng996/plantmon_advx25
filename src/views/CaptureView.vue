@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePlantmonStore } from '@/store/plantmon'
 import type { CaptureResult } from '@/types/plantmon'
+import { transformImageUrl } from '@/utils/imageUtils'
 
 const router = useRouter()
 const plantmonStore = usePlantmonStore()
@@ -29,6 +30,17 @@ const captureResult = ref<CaptureResult>({
   success: false,
   message: '',
   from_database: false,
+})
+
+// 获取转换后的图片URL
+const captureImageUrl = computed(() => {
+  if (captureResult.value.no_bg_image_url) {
+    return transformImageUrl(captureResult.value.no_bg_image_url)
+  }
+  if (captureResult.value.image_url) {
+    return transformImageUrl(captureResult.value.image_url)
+  }
+  return '/Pic/roles/20250724-183408.png'
 })
 
 // 初始化摄像头
@@ -700,11 +712,7 @@ onUnmounted(() => {
               class="w-16 h-16 bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 rounded-full overflow-hidden mx-auto mb-3 shadow-md"
             >
               <img
-                :src="
-                  captureResult.no_bg_image_url ||
-                  captureResult.image_url ||
-                  '/Pic/roles/20250724-183408.png'
-                "
+                :src="captureImageUrl"
                 :alt="captureResult.profile_json?.nickname || captureResult.name"
                 class="w-full h-full object-cover"
                 @error="

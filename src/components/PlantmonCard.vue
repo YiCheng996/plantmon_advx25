@@ -1,16 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Plantmon } from '@/types/plantmon'
+import { getPlantmonImageUrl } from '@/utils/imageUtils'
 
-defineProps<{
+const props = defineProps<{
   plantmon: Plantmon
 }>()
+
+// 获取植宠图片URL
+const plantmonImageUrl = computed(() => getPlantmonImageUrl(props.plantmon))
 </script>
 
 <template>
   <div class="plantmon-card relative aspect-square rounded-xl overflow-hidden">
     <!-- 植宠图片 -->
     <img
-      :src="plantmon.no_bg_image_url || plantmon.image_url || '/Pic/roles/20250724-183408.png'"
+      :src="plantmonImageUrl"
       :alt="plantmon.nickname"
       class="w-full h-full object-cover"
       @error="
