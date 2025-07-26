@@ -741,7 +741,7 @@ onUnmounted(() => {
                       ? '少见'
                       : captureResult.profile_json?.rarity === 'rare'
                         ? '珍稀'
-                        : '未知'
+                        : 'SSR'
                 }}
               </span>
               <span

@@ -35,7 +35,7 @@ const plantmonImageUrl = computed(() => getPlantmonImageUrl(props.plantmon))
             ? '少见'
             : plantmon.rarity === 'rare'
               ? '珍稀'
-              : '未知'
+              : 'SSR'
       }}
     </div>
 

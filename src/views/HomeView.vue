@@ -104,7 +104,7 @@ onMounted(async () => {
                         ? '少见'
                         : activePlantmon.rarity === 'rare'
                           ? '珍稀'
-                          : '未知'
+                          : 'SSR'
                   }}
                 </span>
                 <span
