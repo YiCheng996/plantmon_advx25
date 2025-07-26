@@ -5,7 +5,6 @@ import type {
   PlantsListResponse,
   PlantDetailResponse,
   CaptureResult,
-  ApiResponse,
 } from '@/types/plantmon'
 
 // HTTP请求工具类
@@ -63,7 +62,7 @@ class HttpClient {
   }
 
   // POST请求
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
