@@ -108,8 +108,8 @@ const handleBattleClick = () => {
       <!-- 角色形象展示区 -->
       <div class="flex-1 flex items-center justify-center px-6 -mt-16">
         <div class="character-display flex flex-col items-center justify-center">
-          <!-- 有出战植宠时显示植宠信息 -->
-          <div v-if="activePlantmon" class="text-center mb-4">
+          <!-- 有出战植宠时显示植宠图片 -->
+          <div v-if="activePlantmon" class="text-center">
             <div class="relative">
               <!-- 植宠图片 -->
               <img
@@ -128,32 +128,6 @@ const handleBattleClick = () => {
                 class="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg"
               >
                 出战中
-              </div>
-            </div>
-            <!-- 植宠信息 -->
-            <div class="mt-4 text-white text-center">
-              <h2 class="text-xl font-bold mb-1 font-chinese">{{ activePlantmon.nickname }}</h2>
-              <p class="text-sm text-gray-300 font-chinese">{{ activePlantmon.common_name }}</p>
-              <div class="flex items-center justify-center mt-2 space-x-2">
-                <span
-                  class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-chinese"
-                >
-                  {{
-                    activePlantmon.rarity === 'common'
-                      ? '常见'
-                      : activePlantmon.rarity === 'uncommon'
-                        ? '少见'
-                        : activePlantmon.rarity === 'rare'
-                          ? '珍稀'
-                          : 'SSR'
-                  }}
-                </span>
-                <span
-                  v-if="activePlantmon.trait"
-                  class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-chinese"
-                >
-                  {{ activePlantmon.trait }}
-                </span>
               </div>
             </div>
           </div>
