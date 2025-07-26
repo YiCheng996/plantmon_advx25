@@ -10,8 +10,8 @@ defineProps<{
   <div class="plantmon-card relative aspect-square rounded-xl overflow-hidden">
     <!-- 植宠图片 -->
     <img
-      :src="plantmon.image"
-      :alt="plantmon.name"
+      :src="plantmon.no_bg_image_url || plantmon.image_url || '/Pic/roles/20250724-183408.png'"
+      :alt="plantmon.nickname"
       class="w-full h-full object-cover"
       @error="
         ($event.target as HTMLImageElement).src =
@@ -19,9 +19,33 @@ defineProps<{
       "
     />
 
+    <!-- 稀有度标识 -->
+    <div
+      class="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full text-xs text-white font-bold"
+    >
+      {{
+        plantmon.rarity === 'common'
+          ? '常见'
+          : plantmon.rarity === 'uncommon'
+            ? '少见'
+            : plantmon.rarity === 'rare'
+              ? '珍稀'
+              : '未知'
+      }}
+    </div>
+
+    <!-- 出战标识 -->
+    <div
+      v-if="plantmon.isActive"
+      class="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg"
+    >
+      出战
+    </div>
+
     <!-- 植宠名称覆盖层 -->
     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-      <h3 class="font-bold text-white text-sm font-chinese">{{ plantmon.name }}</h3>
+      <h3 class="font-bold text-white text-sm font-chinese mb-1">{{ plantmon.nickname }}</h3>
+      <p class="text-xs text-gray-300 font-chinese">{{ plantmon.common_name }}</p>
     </div>
   </div>
 </template>

@@ -22,12 +22,17 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/plantmon/, ''),
         secure: true,
+        headers: {
+          // 添加必要的请求头
+          'User-Agent': 'PlantMon-Frontend/1.0',
+        },
         configure: (proxy) => {
-          proxy.on('error', (err) => {
+          proxy.on('error', (err, req) => {
             console.log('代理错误:', err)
+            console.log('请求URL:', req.url)
           })
           proxy.on('proxyReq', (proxyReq, req) => {
-            console.log('发送请求:', req.method, req.url)
+            console.log('发送请求:', req.method, req.url, '-> 目标:', proxyReq.path)
           })
           proxy.on('proxyRes', (proxyRes, req) => {
             console.log('收到响应:', proxyRes.statusCode, req.url)

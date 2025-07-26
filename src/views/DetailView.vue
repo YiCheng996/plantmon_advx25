@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlantmonStore } from '@/store/plantmon'
 
@@ -7,11 +7,56 @@ const route = useRoute()
 const router = useRouter()
 const plantmonStore = usePlantmonStore()
 
-// 获取路由参数中的植宠ID，并进行URL解码
-const plantmonId = decodeURIComponent(route.params.id as string)
+// 获取路由参数中的拉丁名称，并进行URL解码
+const latinName = decodeURIComponent(route.params.id as string)
 
-// 根据ID获取植宠数据
-const plantmon = computed(() => plantmonStore.getPlantmonById(plantmonId))
+// 根据拉丁名称获取植宠数据
+const plantmon = computed(() => plantmonStore.getPlantmonByLatinName(latinName))
+
+// 加载状态
+const loading = ref(false)
+const error = ref('')
+
+// 初始化数据
+onMounted(async () => {
+  // 如果store中没有数据，先初始化
+  if (plantmonStore.totalCount === 0) {
+    await plantmonStore.initialize()
+  }
+
+  // 如果仍然找不到植宠，尝试单独获取
+  if (!plantmon.value && !plantmonStore.isLoading) {
+    await loadPlantmonDetail()
+  }
+})
+
+// 加载植宠详情
+const loadPlantmonDetail = async () => {
+  loading.value = true
+  error.value = ''
+
+  try {
+    const detail = await plantmonStore.getPlantmonDetail(latinName)
+
+    // 将获取的详情转换为Plantmon格式并添加到store
+    const newPlantmon = {
+      ...detail.profile,
+      id: `#${String(plantmonStore.totalCount + 1).padStart(3, '0')}`,
+      image_url: detail.image_url,
+      no_bg_image_url: detail.no_bg_image_url,
+      isActive: false,
+      created_at: detail.created_at,
+      updated_at: detail.updated_at,
+    }
+
+    plantmonStore.addPlantmon(newPlantmon)
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : '加载植宠详情失败'
+    console.error('加载植宠详情失败:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
 // 检查是否为当前出战植宠
 const isActive = computed(() => plantmon.value?.isActive || false)
@@ -26,7 +71,7 @@ const toggleActive = () => {
       // 如果已经是出战状态，暂不支持取消（根据需求）
       return
     } else {
-      plantmonStore.setActivePlantmon(plantmon.value.id)
+      plantmonStore.setActivePlantmon(plantmon.value.latin_name)
     }
   }
 }
@@ -94,13 +139,23 @@ const attributeData = computed(() => [
       </div>
 
       <!-- 植宠等级 -->
-      <div class="rarity-badge">{{ plantmon.rarity || 'SSSR' }}</div>
+      <div class="rarity-badge">
+        {{
+          plantmon.rarity === 'common'
+            ? '常见'
+            : plantmon.rarity === 'uncommon'
+              ? '少见'
+              : plantmon.rarity === 'rare'
+                ? '珍稀'
+                : '未知'
+        }}
+      </div>
 
       <!-- 植宠图片 -->
       <img
         class="plantmon-image"
-        :src="plantmon.image"
-        :alt="plantmon.name"
+        :src="plantmon.no_bg_image_url || plantmon.image_url || '/Pic/roles/20250724-183408.png'"
+        :alt="plantmon.nickname"
         @error="
           ($event.target as HTMLImageElement).src =
             'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
@@ -108,8 +163,9 @@ const attributeData = computed(() => [
       />
 
       <!-- 植宠名称 -->
-      <div class="plantmon-name">{{ plantmon.name }}</div>
-      <div class="plantmon-subtitle">{{ plantmon.id }}</div>
+      <div class="plantmon-name">{{ plantmon.nickname }}</div>
+      <div class="plantmon-subtitle">{{ plantmon.common_name }}</div>
+      <div class="plantmon-latin">{{ plantmon.latin_name }}</div>
 
       <!-- 标签页导航 -->
       <div class="tab-navigation">
@@ -178,9 +234,8 @@ const attributeData = computed(() => [
             <div v-for="skill in plantmon.skills" :key="skill.name" class="skill-item">
               <div class="skill-header">
                 <h4 class="skill-name">{{ skill.name }}</h4>
-                <span v-if="skill.damage" class="skill-damage"> {{ skill.damage }} 伤害 </span>
               </div>
-              <p class="skill-description">{{ skill.description }}</p>
+              <p class="skill-description">基于植物特性的独特技能</p>
             </div>
           </div>
         </div>

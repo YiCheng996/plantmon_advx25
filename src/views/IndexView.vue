@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { usePlantmonStore } from '@/store/plantmon'
 import PlantmonCard from '@/components/PlantmonCard.vue'
@@ -8,6 +8,14 @@ const plantmonStore = usePlantmonStore()
 
 // 获取所有植宠列表
 const plantmons = computed(() => plantmonStore.plantmons)
+
+// 初始化数据
+onMounted(async () => {
+  // 如果还没有初始化过，则进行初始化
+  if (plantmonStore.totalCount === 0 && !plantmonStore.isLoading) {
+    await plantmonStore.initialize()
+  }
+})
 </script>
 
 <template>
@@ -25,19 +33,54 @@ const plantmons = computed(() => plantmonStore.plantmons)
           <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-6 h-6" />
         </RouterLink>
         <h1 class="text-lg font-bold text-white font-chinese">植宠图鉴</h1>
-        <div class="w-6"></div>
-        <!-- 占位，保持标题居中 -->
+        <div class="flex items-center text-sm text-gray-300 font-chinese">
+          已收集：<span class="font-bold text-yellow-400 ml-1">{{ plantmons.length }}</span>
+          <span v-if="plantmonStore.isLoading" class="ml-2 text-blue-400">加载中...</span>
+        </div>
       </div>
     </header>
 
     <!-- 内容区域 -->
     <main class="p-4 pb-8">
+      <!-- 加载状态 -->
+      <div v-if="plantmonStore.isLoading && plantmons.length === 0" class="text-center py-16">
+        <div
+          class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border border-blue-400/30"
+        >
+          <div
+            class="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-3 font-chinese">正在加载植宠数据</h2>
+        <p class="text-gray-400 font-chinese">请稍候，正在从服务器获取最新数据...</p>
+      </div>
+
+      <!-- 错误状态 -->
+      <div v-else-if="plantmonStore.hasErrors && plantmons.length === 0" class="text-center py-16">
+        <div
+          class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border border-red-400/30"
+        >
+          <span class="text-3xl">⚠️</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-3 font-chinese">加载失败</h2>
+        <p class="text-gray-400 mb-6 px-4 font-chinese">
+          无法从服务器获取植宠数据<br />
+          请检查网络连接后重试
+        </p>
+        <button
+          @click="plantmonStore.initialize()"
+          class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg font-chinese"
+        >
+          重新加载
+        </button>
+      </div>
+
       <!-- 植宠网格列表 -->
-      <div v-if="plantmons.length > 0" class="grid grid-cols-2 gap-4">
+      <div v-else-if="plantmons.length > 0" class="grid grid-cols-2 gap-4">
         <RouterLink
           v-for="plantmon in plantmons"
-          :key="plantmon.id"
-          :to="`/detail/${encodeURIComponent(plantmon.id)}`"
+          :key="plantmon.latin_name"
+          :to="`/detail/${encodeURIComponent(plantmon.latin_name)}`"
           class="transform transition-all duration-200 hover:scale-[1.02]"
         >
           <PlantmonCard :plantmon="plantmon" />
