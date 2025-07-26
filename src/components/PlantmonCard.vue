@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Plantmon } from '@/types/plantmon'
-import { getPlantmonImageUrl } from '@/utils/imageUtils'
+import { getPlantmonOriginalImageUrl } from '@/utils/imageUtils'
 
 const props = defineProps<{
   plantmon: Plantmon
 }>()
 
-// 获取植宠图片URL
-const plantmonImageUrl = computed(() => getPlantmonImageUrl(props.plantmon))
+// 获取植宠图片URL - 图鉴列表使用原始图片
+const plantmonImageUrl = computed(() => getPlantmonOriginalImageUrl(props.plantmon))
 </script>
 
 <template>

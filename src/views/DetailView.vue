@@ -107,10 +107,35 @@ const attributeData = computed(() => [
 </script>
 
 <template>
-  <div class="screen">
+  <div
+    class="screen bg-black bg-cover bg-center bg-no-repeat relative"
+    style="background-image: url('/Pic/scenes/111.png')"
+  >
+    <!-- 背景遮罩层，增强内容可读性 -->
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 pointer-events-none"
+    ></div>
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-black/90 backdrop-blur-md sticky top-0 z-20 relative">
+      <div class="flex items-center justify-between p-4">
+        <button
+          @click="goBack"
+          class="flex items-center text-orange-500 hover:text-orange-400 transition-colors duration-200"
+        >
+          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-6 h-6" />
+        </button>
+        <h1 class="text-lg font-bold text-white font-chinese">植宠详情</h1>
+        <div class="w-6"></div>
+        <!-- 占位元素，保持居中 -->
+      </div>
+    </header>
+
     <!-- 如果植宠不存在，显示错误页面 -->
-    <div v-if="!plantmon" class="error-container">
-      <div class="error-content">
+    <div v-if="!plantmon" class="error-container relative z-10">
+      <div
+        class="error-content bg-black/50 backdrop-blur-md rounded-3xl p-8 mx-4 border border-white/20"
+      >
         <div class="error-emoji">❌</div>
         <h2 class="error-title">植宠不存在</h2>
         <p class="error-message">可能是链接错误或植宠已被删除</p>
@@ -122,7 +147,7 @@ const attributeData = computed(() => [
     </div>
 
     <!-- 植宠详情内容 -->
-    <div v-else class="detail-container">
+    <div v-else class="detail-container relative z-10">
       <!-- 背景图片 -->
       <img class="background-image" alt="" src="/Pic/scenes/detailback.jpg" />
 
@@ -131,13 +156,6 @@ const attributeData = computed(() => [
 
       <!-- 半透明容器 -->
       <div class="content-container"></div>
-
-      <!-- 顶部导航栏 -->
-      <div class="top-nav-bar">
-        <button @click="goBack" class="back-button">
-          <img src="/Pic/elements/Arrow left.svg" alt="返回" class="back-icon" />
-        </button>
-      </div>
 
       <!-- 植宠等级 -->
       <div class="rarity-badge">
@@ -259,17 +277,27 @@ const attributeData = computed(() => [
   width: 100%;
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   font-family: 'DOUYUFont', sans-serif;
   color: #fff;
+  /* 背景图像优化 */
+  background-attachment: fixed;
+}
+
+/* 移动端背景优化 */
+@media (max-width: 768px) {
+  .screen {
+    background-attachment: scroll;
+  }
 }
 
 /* 错误页面样式 */
 .error-container {
-  min-height: 100vh;
+  min-height: calc(100vh - 60px); /* 减去导航栏高度 */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem 0;
 }
 
 .error-content {
@@ -284,14 +312,16 @@ const attributeData = computed(() => [
 .error-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #d1d5db;
+  color: #ffffff;
   margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .error-message {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #e5e7eb;
   margin-bottom: 1.5rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .error-button {
@@ -323,7 +353,7 @@ const attributeData = computed(() => [
 .detail-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px); /* 减去导航栏高度 */
   overflow: hidden;
 }
 
@@ -333,7 +363,7 @@ const attributeData = computed(() => [
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   object-fit: cover;
   opacity: 0.6;
   z-index: 1;
@@ -364,34 +394,7 @@ const attributeData = computed(() => [
   z-index: 3;
 }
 
-/* 顶部导航栏 */
-.top-nav-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  z-index: 10;
-}
-
-.back-button {
-  width: 24px;
-  height: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.back-icon {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) saturate(100%) invert(45%) sepia(85%) saturate(2154%) hue-rotate(23deg)
-    brightness(101%) contrast(101%);
-}
+/* 移除原有的顶部导航栏样式，现在使用与IndexView一致的样式 */
 
 .nav-title-wrapper {
   position: absolute;
@@ -477,10 +480,27 @@ const attributeData = computed(() => [
   white-space: nowrap;
 }
 
+.plantmon-latin {
+  position: absolute;
+  top: 385px;
+  left: 40px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.3px;
+  color: #8b9688;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  text-align: left;
+  white-space: nowrap;
+  font-style: italic;
+}
+
 /* 标签页导航 */
 .tab-navigation {
   position: absolute;
-  top: 390px;
+  top: 420px;
   left: 50%;
   transform: translateX(-50%);
   width: 300px;
@@ -532,7 +552,7 @@ const attributeData = computed(() => [
 /* 标签页内容 */
 .tab-content {
   position: absolute;
-  top: 440px;
+  top: 460px;
   left: 20px;
   right: 20px;
   bottom: 80px;
@@ -784,6 +804,10 @@ const attributeData = computed(() => [
   }
 
   .plantmon-subtitle {
+    left: 20px;
+  }
+
+  .plantmon-latin {
     left: 20px;
   }
 

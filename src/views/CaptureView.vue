@@ -26,6 +26,21 @@ const currentFacingMode = ref<'user' | 'environment'>('environment')
 // 添加引导图显示状态
 const showGuide = ref(true)
 
+// 加载动画文字状态
+const loadingTexts = [
+  '正在搜索草木之灵...',
+  '感知植物的生命力...',
+  '解析叶片的秘密...',
+  '唤醒沉睡的精灵...',
+  '编织自然的魔法...',
+  '凝聚大地的能量...',
+  '塑造植宠的灵魂...',
+  '即将完成召唤...',
+]
+const currentLoadingTextIndex = ref(0)
+const currentLoadingText = ref(loadingTexts[0])
+let loadingTextInterval: number | null = null
+
 const captureResult = ref<CaptureResult>({
   success: false,
   message: '',
@@ -298,13 +313,13 @@ const callPlantmonAPI = async (imageData: string): Promise<CaptureResult> => {
 
     if (error instanceof Error) {
       if (error.message.includes('Not a plant')) {
-        errorMessage = '图片中未检测到植物，请拍摄植物照片'
+        errorMessage = '捕获失败，请拍摄植物照片'
       } else if (error.message.includes('Low confidence')) {
-        errorMessage = '植物识别置信度过低，请拍摄更清晰的植物照片'
+        errorMessage = '捕获失败，请拍摄更清晰的植物照片'
       } else if (error.message.includes('网络')) {
-        errorMessage = '网络连接失败，请检查网络后重试'
+        errorMessage = '捕获失败，请检查网络后重试'
       } else if (error.message.includes('超时')) {
-        errorMessage = '请求超时，请检查网络连接后重试'
+        errorMessage = '捕获失败，请检查网络连接后重试'
       } else {
         errorMessage = error.message
       }
@@ -319,6 +334,25 @@ const callPlantmonAPI = async (imageData: string): Promise<CaptureResult> => {
   }
 }
 
+// 开始加载文字动画
+const startLoadingTextAnimation = () => {
+  currentLoadingTextIndex.value = 0
+  currentLoadingText.value = loadingTexts[0]
+
+  loadingTextInterval = setInterval(() => {
+    currentLoadingTextIndex.value = (currentLoadingTextIndex.value + 1) % loadingTexts.length
+    currentLoadingText.value = loadingTexts[currentLoadingTextIndex.value]
+  }, 3000) // 每3秒切换一次
+}
+
+// 停止加载文字动画
+const stopLoadingTextAnimation = () => {
+  if (loadingTextInterval) {
+    clearInterval(loadingTextInterval)
+    loadingTextInterval = null
+  }
+}
+
 // 处理拍照和识别流程
 const handleCapture = async () => {
   if (!cameraReady.value) {
@@ -327,6 +361,7 @@ const handleCapture = async () => {
   }
 
   isCapturing.value = true
+  startLoadingTextAnimation()
 
   try {
     // 1. 拍照
@@ -355,6 +390,7 @@ const handleCapture = async () => {
       from_database: false,
     }
   } finally {
+    stopLoadingTextAnimation()
     isCapturing.value = false
     showResultModal.value = true
   }
@@ -451,6 +487,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   cleanupCamera()
+  stopLoadingTextAnimation()
 })
 </script>
 
@@ -471,10 +508,7 @@ onUnmounted(() => {
           <img src="/Pic/elements/Arrow left.svg" alt="返回" class="w-6 h-6 mr-2" />
           <span class="text-sm font-medium">返回</span>
         </button>
-        <h1 class="text-lg font-bold text-white flex items-center font-chinese">
-          <span class="text-xl mr-2">📸</span>
-          拍照捕获
-        </h1>
+
         <!-- 切换摄像头按钮 -->
         <button
           v-if="cameraReady"
@@ -608,23 +642,10 @@ onUnmounted(() => {
         class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-30"
       >
         <div class="text-center text-white">
-          <div
-            class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse shadow-2xl"
-          >
-            <span class="text-4xl">🧬</span>
-          </div>
-          <p class="text-xl mb-2 font-bold font-chinese">AI生成中...</p>
-          <p class="text-sm text-gray-400 mb-4 font-chinese">正在将您的照片转化为独特的植宠</p>
-          <div class="flex justify-center space-x-1">
-            <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-            <div
-              class="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-              style="animation-delay: 0.1s"
-            ></div>
-            <div
-              class="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
-              style="animation-delay: 0.2s"
-            ></div>
+          <div class="loading-text-container">
+            <p class="text-xl font-bold font-chinese loading-text" key="currentLoadingText">
+              {{ currentLoadingText }}
+            </p>
           </div>
         </div>
       </div>
@@ -683,95 +704,110 @@ onUnmounted(() => {
       v-if="showResultModal"
       class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-40 p-4"
     >
-      <div
-        class="w-full max-w-sm transform animate-modal-in"
-        :class="{
-          'bg-white rounded-3xl p-6 shadow-2xl border border-white/20':
-            captureResult.success && captureResult.profile_json,
-          'bg-transparent p-0': !captureResult.success || !captureResult.profile_json,
-        }"
-      >
+      <div class="w-full max-w-sm transform animate-modal-in bg-transparent p-0">
         <!-- 成功结果 -->
-        <div v-if="captureResult.success && captureResult.profile_json" class="text-center">
-          <div
-            class="w-20 h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
-          >
-            <span class="text-4xl">🎉</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2 font-chinese">
-            {{ captureResult.from_database ? '发现已知植宠！' : '生成成功！' }}
-          </h2>
-          <p class="text-sm text-gray-500 mb-6 font-chinese">
-            {{
-              captureResult.from_database
-                ? '在数据库中找到了这个植物的资料'
-                : 'AI成功为您生成了独特的植宠伙伴'
-            }}
-          </p>
+        <div
+          v-if="captureResult.success && captureResult.profile_json"
+          class="svg-popup-container success-popup"
+        >
+          <!-- SVG弹窗背景 -->
+          <img src="/Pic/elements/popup.svg" alt="弹窗背景" class="w-full h-full object-contain" />
 
-          <!-- 新植宠信息卡片 -->
-          <div
-            class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 mb-6 border border-purple-100"
+          <!-- 关闭按钮 -->
+          <button
+            @click="closeModal"
+            class="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center text-white hover:text-gray-200 transition-colors duration-200 bg-black/20 rounded-full backdrop-blur-sm hover:bg-black/30"
           >
-            <div
-              class="w-16 h-16 bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 rounded-full overflow-hidden mx-auto mb-3 shadow-md"
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <img
-                :src="captureImageUrl"
-                :alt="captureResult.profile_json?.nickname || captureResult.name"
-                class="w-full h-full object-cover"
-                @error="
-                  ($event.target as HTMLImageElement).src =
-                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
-                "
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               />
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-1 font-chinese">
-              {{ captureResult.profile_json?.nickname || captureResult.name || '未知植宠' }}
-            </h3>
-            <p class="text-sm text-gray-500 mb-1 font-chinese">
-              {{ captureResult.profile_json?.common_name || '未知植物' }}
-            </p>
-            <p class="text-xs text-gray-400 mb-3 font-mono font-english">
-              {{ captureResult.profile_json?.latin_name || 'Unknown species' }}
-            </p>
-            <div class="flex flex-wrap gap-1 justify-center">
-              <span
-                class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium font-chinese"
-              >
-                {{
-                  captureResult.profile_json?.rarity === 'common'
-                    ? '常见'
-                    : captureResult.profile_json?.rarity === 'uncommon'
-                      ? '少见'
-                      : captureResult.profile_json?.rarity === 'rare'
-                        ? '珍稀'
-                        : 'SSR'
-                }}
-              </span>
-              <span
-                v-if="captureResult.profile_json?.trait"
-                class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium font-chinese"
-              >
-                {{ captureResult.profile_json.trait }}
-              </span>
-            </div>
-          </div>
+            </svg>
+          </button>
 
-          <!-- 按钮组 -->
-          <div class="flex gap-3">
-            <button
-              @click="viewDetails"
-              class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 font-chinese"
-            >
-              查看详情
-            </button>
-            <button
-              @click="continueCaptureCapture"
-              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl transition-all duration-200 font-chinese"
-            >
-              继续生成
-            </button>
+          <!-- 弹窗内容 -->
+          <div class="svg-popup-content success-content">
+            <!-- 标题区域 -->
+            <div class="flex-shrink-0">
+              <h2 class="text-xl font-bold text-white font-chinese drop-shadow-lg mb-2">
+                {{ captureResult.from_database ? '发现已知植宠！' : '捕获成功！' }}
+              </h2>
+            </div>
+
+            <!-- 植宠信息区域 -->
+            <div class="flex-1 flex flex-col items-center justify-center px-2">
+              <!-- 植宠头像 -->
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-purple-100/20 via-blue-100/20 to-green-100/20 rounded-full overflow-hidden mb-3 shadow-lg border-2 border-white/30 backdrop-blur-sm"
+              >
+                <img
+                  :src="captureImageUrl"
+                  :alt="captureResult.profile_json?.nickname || captureResult.name"
+                  class="w-full h-full object-cover"
+                  @error="
+                    ($event.target as HTMLImageElement).src =
+                      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1zaXplPSI0MCI+8J+MujwvdGV4dD4KPHN2Zz4='
+                  "
+                />
+              </div>
+
+              <!-- 植宠名称 -->
+              <h3 class="text-lg font-bold text-white mb-1 font-chinese drop-shadow-lg">
+                {{ captureResult.profile_json?.nickname || captureResult.name || '未知植宠' }}
+              </h3>
+              <p class="text-sm text-white/90 mb-2 font-chinese drop-shadow-md">
+                {{ captureResult.profile_json?.common_name || '未知植物' }}
+              </p>
+
+              <!-- 标签 -->
+              <div class="flex flex-wrap gap-1 justify-center mb-2">
+                <span
+                  class="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full font-medium font-chinese border border-white/30"
+                >
+                  {{
+                    captureResult.profile_json?.rarity === 'common'
+                      ? '常见'
+                      : captureResult.profile_json?.rarity === 'uncommon'
+                        ? '少见'
+                        : captureResult.profile_json?.rarity === 'rare'
+                          ? '珍稀'
+                          : 'SSR'
+                  }}
+                </span>
+                <span
+                  v-if="captureResult.profile_json?.trait"
+                  class="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full font-medium font-chinese border border-white/30"
+                >
+                  {{ captureResult.profile_json.trait }}
+                </span>
+              </div>
+            </div>
+
+            <!-- 按钮区域 -->
+            <div class="flex-shrink-0 flex gap-2">
+              <button
+                @click="viewDetails"
+                class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 font-chinese shadow-lg text-sm"
+              >
+                查看详情
+              </button>
+              <button
+                @click="continueCaptureCapture"
+                class="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 font-chinese shadow-lg text-sm border border-white/30"
+              >
+                继续捕获
+              </button>
+            </div>
           </div>
         </div>
 
@@ -806,7 +842,7 @@ onUnmounted(() => {
           <div class="svg-popup-content">
             <!-- 标题区域 -->
             <div class="flex-shrink-0">
-              <h2 class="text-2xl font-bold text-white font-chinese drop-shadow-lg">生成失败</h2>
+              <h2 class="text-2xl font-bold text-white font-chinese drop-shadow-lg">捕获失败</h2>
             </div>
 
             <!-- 错误信息区域 -->
@@ -960,7 +996,7 @@ onUnmounted(() => {
 
 .svg-popup-content {
   position: absolute;
-  top: 20%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   width: 85%;
@@ -970,12 +1006,56 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   text-align: center;
-  padding: 2rem 1rem;
+  /* padding: 2rem 1rem; */
 }
 
 /* 失败弹窗专用样式 */
 .failure-popup {
   filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+}
+
+/* 成功弹窗专用样式 */
+.success-popup {
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+}
+
+.success-content {
+  /* 成功弹窗内容调整 */
+  top: 8%;
+  height: 80%;
+  padding: 1rem 0.75rem;
+}
+
+/* 加载文字动画样式 */
+.loading-text-container {
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  animation: fadeInOut 3s ease-in-out infinite;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
 /* 响应式调整 */
@@ -1003,6 +1083,31 @@ onUnmounted(() => {
   .svg-popup-content button {
     font-size: 0.875rem;
     padding: 0.75rem 2rem;
+  }
+
+  /* 成功弹窗响应式调整 */
+  .success-content {
+    top: 6%;
+    height: 85%;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .success-content h2 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .success-content h3 {
+    font-size: 1rem;
+  }
+
+  .success-content p {
+    font-size: 0.75rem;
+  }
+
+  .success-content .w-20 {
+    width: 4rem;
+    height: 4rem;
   }
 }
 </style>
