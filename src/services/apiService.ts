@@ -26,13 +26,23 @@ class HttpClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
+      // 构建请求头
+      const headers: Record<string, string> = {}
+
+      // 只有在不是FormData请求时才添加默认的Content-Type
+      if (!(options.body instanceof FormData)) {
+        Object.assign(headers, API_CONFIG.DEFAULT_HEADERS)
+      }
+
+      // 合并用户提供的headers
+      if (options.headers) {
+        Object.assign(headers, options.headers)
+      }
+
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
-        headers: {
-          ...API_CONFIG.DEFAULT_HEADERS,
-          ...options.headers,
-        },
+        headers,
       })
 
       clearTimeout(timeoutId)
@@ -74,9 +84,7 @@ class HttpClient {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: formData,
-      headers: {
-        // 不设置Content-Type，让浏览器自动设置multipart/form-data边界
-      },
+      // 不设置headers，让request方法自动处理FormData的Content-Type
     })
   }
 }

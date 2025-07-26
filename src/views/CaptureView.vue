@@ -259,6 +259,18 @@ const callPlantmonAPI = async (imageData: string): Promise<CaptureResult> => {
     const blob = await base64Response.blob()
     const imageFile = new File([blob], 'capture.jpg', { type: 'image/jpeg' })
 
+    // 添加调试信息
+    console.log('📊 文件对象信息:', {
+      name: imageFile.name,
+      type: imageFile.type,
+      size: imageFile.size,
+      lastModified: imageFile.lastModified,
+    })
+    console.log('📊 Blob信息:', {
+      size: blob.size,
+      type: blob.type,
+    })
+
     console.log('📤 正在上传图片到API...')
 
     // 使用store中的processPlantImage方法调用API
