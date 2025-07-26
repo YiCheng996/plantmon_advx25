@@ -71,7 +71,7 @@ const buildBattleUrl = () => {
 const handleBattleClick = () => {
   const url = buildBattleUrl()
   console.log('跳转到战斗页面，携带数据:', url)
-  window.open(url, '_blank')
+  window.location.href = url
 }
 </script>
 
